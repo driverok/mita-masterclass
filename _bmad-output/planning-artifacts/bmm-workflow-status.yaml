@@ -40,10 +40,10 @@ workflow_status:
     name: "Solutioning"
     workflows:
       - id: "create-architecture"
-        status: "required"
+        status: "completed"
         agent: "architect"
         command: "/bmad:bmm:workflows:create-architecture"
-        output: null
+        output: "architecture.md"
       - id: "create-epics-and-stories"
         status: "required"
         agent: "pm"
