@@ -49,7 +49,7 @@ export default function IssuesPage() {
     }
   }, [session, fetchIssues])
 
-  const handleCreateIssue = async (data: { title: string; description: string; priority: IssuePriority }) => {
+  const handleCreateIssue = async (data: { title: string; description: string; priority: IssuePriority; storyPoints: number | null }) => {
     try {
       const response = await fetch('/api/issues', {
         method: 'POST',
@@ -129,6 +129,12 @@ export default function IssuesPage() {
             <p className="text-sm text-gray-500">Mini Issue Tracker</p>
           </div>
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => router.push('/sprints')}
+              className="btn-secondary text-sm"
+            >
+              Sprint Dashboard
+            </button>
             <span className="text-sm text-gray-600">
               Welcome, {session.user.name}
             </span>

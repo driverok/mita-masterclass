@@ -27,6 +27,7 @@ export const issueCreateSchema = z.object({
     .min(1, 'Description is required')
     .max(2000, 'Description must be at most 2000 characters'),
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).optional().default('MEDIUM'),
+  storyPoints: z.number().int().min(1).max(21).nullable().optional(),
 })
 
 export const issueUpdateSchema = z.object({
@@ -42,6 +43,8 @@ export const issueUpdateSchema = z.object({
     .optional(),
   status: z.enum(['OPEN', 'IN_PROGRESS', 'DONE']).optional(),
   priority: z.enum(['LOW', 'MEDIUM', 'HIGH']).optional(),
+  storyPoints: z.number().int().min(1).max(21).nullable().optional(),
+  sprintId: z.string().nullable().optional(),
 })
 
 // Status transition validation

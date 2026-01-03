@@ -91,7 +91,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    const { title, description, status, priority } = result.data
+    const { title, description, status, priority, storyPoints, sprintId } = result.data
 
     // Validate status transition
     if (status && !isValidStatusTransition(existingIssue.status, status)) {
@@ -133,6 +133,13 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       })
     }
 
+    // Track completedAt when status changes to DONE
+    const completedAt = status === 'DONE' && existingIssue.status !== 'DONE'
+      ? new Date()
+      : status !== 'DONE' && existingIssue.status === 'DONE'
+        ? null
+        : undefined
+
     // Update issue and create activity logs in a transaction
     const [updatedIssue] = await prisma.$transaction([
       prisma.issue.update({
@@ -142,6 +149,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
           ...(description && { description }),
           ...(status && { status: status as IssueStatus }),
           ...(priority && { priority: priority as IssuePriority }),
+          ...(storyPoints !== undefined && { storyPoints }),
+          ...(sprintId !== undefined && { sprintId }),
+          ...(completedAt !== undefined && { completedAt }),
         },
         include: {
           activities: {

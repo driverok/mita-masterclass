@@ -18,25 +18,49 @@ model User {
 
   issues       Issue[]
   activities   ActivityLog[]
+  sprints      Sprint[]
+}
+
+model Sprint {
+  id          String    @id @default(cuid())
+  name        String
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  issues      Issue[]
+
+  @@index([userId])
+  @@index([startDate, endDate])
 }
 
 model Issue {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   description String
-  status      String   @default("OPEN")      // OPEN, IN_PROGRESS, DONE
-  priority    String   @default("MEDIUM")    // LOW, MEDIUM, HIGH
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      String    @default("OPEN")      // OPEN, IN_PROGRESS, DONE
+  priority    String    @default("MEDIUM")    // LOW, MEDIUM, HIGH
+  storyPoints Int?                            // Fibonacci: 1, 2, 3, 5, 8, 13, 21
+  completedAt DateTime?                       // Set when status changes to DONE
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sprintId    String?
+  sprint      Sprint?   @relation(fields: [sprintId], references: [id])
 
   activities  ActivityLog[]
 
   @@index([userId])
   @@index([status])
   @@index([priority])
+  @@index([sprintId])
 }
 
 model ActivityLog {

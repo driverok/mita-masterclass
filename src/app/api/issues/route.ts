@@ -81,13 +81,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { title, description, priority } = result.data
+    const { title, description, priority, storyPoints } = result.data
 
     const issue = await prisma.issue.create({
       data: {
         title,
         description,
         priority: priority as IssuePriority,
+        storyPoints: storyPoints ?? null,
         userId: session.user.id,
       },
     })

@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { IssuePriority } from '@/types'
+import { IssuePriority, STORY_POINT_VALUES } from '@/types'
 
 interface IssueFormProps {
-  onSubmit: (data: { title: string; description: string; priority: IssuePriority }) => Promise<void>
+  onSubmit: (data: { title: string; description: string; priority: IssuePriority; storyPoints: number | null }) => Promise<void>
   onCancel: () => void
 }
 
@@ -12,6 +12,7 @@ export function IssueForm({ onSubmit, onCancel }: IssueFormProps) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState<IssuePriority>('MEDIUM')
+  const [storyPoints, setStoryPoints] = useState<number | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -31,7 +32,7 @@ export function IssueForm({ onSubmit, onCancel }: IssueFormProps) {
 
     setSaving(true)
     try {
-      await onSubmit({ title, description, priority })
+      await onSubmit({ title, description, priority, storyPoints })
     } catch {
       setError('Failed to create issue')
     } finally {
@@ -77,20 +78,40 @@ export function IssueForm({ onSubmit, onCancel }: IssueFormProps) {
           />
         </div>
 
-        <div>
-          <label htmlFor="priority" className="label">
-            Priority
-          </label>
-          <select
-            id="priority"
-            className="input"
-            value={priority}
-            onChange={(e) => setPriority(e.target.value as IssuePriority)}
-          >
-            <option value="LOW">Low</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HIGH">High</option>
-          </select>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="priority" className="label">
+              Priority
+            </label>
+            <select
+              id="priority"
+              className="input"
+              value={priority}
+              onChange={(e) => setPriority(e.target.value as IssuePriority)}
+            >
+              <option value="LOW">Low</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HIGH">High</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="storyPoints" className="label">
+              Story Points
+            </label>
+            <select
+              id="storyPoints"
+              className="input"
+              value={storyPoints ?? ''}
+              onChange={(e) => setStoryPoints(e.target.value ? parseInt(e.target.value, 10) : null)}
+            >
+              <option value="">No estimate</option>
+              {STORY_POINT_VALUES.map((points) => (
+                <option key={points} value={points}>
+                  {points} {points === 1 ? 'point' : 'points'}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="flex gap-2">

@@ -65,11 +65,25 @@ workflow_status:
     name: "Implementation"
     workflows:
       - id: "sprint-planning"
-        status: "required"
+        status: "completed"
         agent: "sm"
         command: "/bmad:bmm:workflows:sprint-planning"
         note: "Creates sprint-status.yaml for implementation tracking"
         output: null
+      - id: "feature-implementation"
+        status: "completed"
+        agent: "dev"
+        note: "Sprint Burndown Chart feature fully implemented"
+        completed_at: "2026-01-04"
+        deliverables:
+          - "prisma/schema.prisma - Sprint model & Issue extensions"
+          - "src/lib/burndown.ts - Burndown & velocity calculations"
+          - "src/app/api/sprints/* - Sprint API routes"
+          - "src/components/BurndownChart.tsx"
+          - "src/components/VelocityChart.tsx"
+          - "src/components/SprintSummary.tsx"
+          - "src/components/StoryPointsSelect.tsx"
+          - "src/app/sprints/page.tsx - Sprint Dashboard"
 
 # Discovery workflows selected: none
 discovery:

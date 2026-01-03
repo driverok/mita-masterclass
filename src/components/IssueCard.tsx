@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Issue, IssueStatus, IssuePriority } from '@/types'
+import { Issue, IssueStatus, IssuePriority, STORY_POINT_VALUES } from '@/types'
 import { VALID_STATUS_TRANSITIONS } from '@/lib/validations'
 
 interface IssueCardProps {
@@ -36,6 +36,7 @@ export function IssueCard({
   const [title, setTitle] = useState(issue.title)
   const [description, setDescription] = useState(issue.description)
   const [priority, setPriority] = useState<IssuePriority>(issue.priority)
+  const [storyPoints, setStoryPoints] = useState<number | null>(issue.storyPoints ?? null)
   const [saving, setSaving] = useState(false)
 
   const getNextStatus = (): IssueStatus | null => {
@@ -54,7 +55,7 @@ export function IssueCard({
 
   const handleSave = async () => {
     setSaving(true)
-    await onUpdate(issue.id, { title, description, priority })
+    await onUpdate(issue.id, { title, description, priority, storyPoints })
     setSaving(false)
   }
 
@@ -62,6 +63,7 @@ export function IssueCard({
     setTitle(issue.title)
     setDescription(issue.description)
     setPriority(issue.priority)
+    setStoryPoints(issue.storyPoints ?? null)
     onCancelEdit()
   }
 
@@ -86,17 +88,34 @@ export function IssueCard({
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-          <div>
-            <label className="label">Priority</label>
-            <select
-              className="input"
-              value={priority}
-              onChange={(e) => setPriority(e.target.value as IssuePriority)}
-            >
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="label">Priority</label>
+              <select
+                className="input"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value as IssuePriority)}
+              >
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+              </select>
+            </div>
+            <div>
+              <label className="label">Story Points</label>
+              <select
+                className="input"
+                value={storyPoints ?? ''}
+                onChange={(e) => setStoryPoints(e.target.value ? parseInt(e.target.value, 10) : null)}
+              >
+                <option value="">No estimate</option>
+                {STORY_POINT_VALUES.map((points) => (
+                  <option key={points} value={points}>
+                    {points} {points === 1 ? 'point' : 'points'}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div className="flex gap-2">
             <button
@@ -124,6 +143,11 @@ export function IssueCard({
             <span className={`badge-${issue.priority.toLowerCase()}`}>
               {priorityLabels[issue.priority]}
             </span>
+            {issue.storyPoints && (
+              <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                {issue.storyPoints} {issue.storyPoints === 1 ? 'pt' : 'pts'}
+              </span>
+            )}
           </div>
           <p className="text-gray-600 mb-3">{issue.description}</p>
           <div className="flex items-center gap-4 text-sm">
