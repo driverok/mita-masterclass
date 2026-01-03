@@ -24,10 +24,10 @@ workflow_status:
     name: "Planning"
     workflows:
       - id: "prd"
-        status: "required"
+        status: "completed"
         agent: "pm"
         command: "/bmad:bmm:workflows:create-prd"
-        output: null
+        output: "prd.md"
       - id: "create-ux-design"
         status: "conditional"
         condition: "if_has_ui"
