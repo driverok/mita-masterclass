@@ -80,7 +80,10 @@ export default function IssuesPage() {
 
       if (result.success) {
         setEditingIssue(null)
-        fetchIssues()
+        // Update the issue in local state immediately for instant UI feedback
+        setIssues(prev => prev.map(issue =>
+          issue.id === id ? { ...issue, ...result.data } : issue
+        ))
       } else {
         alert(result.error)
       }
@@ -100,7 +103,8 @@ export default function IssuesPage() {
       const result = await response.json()
 
       if (result.success) {
-        fetchIssues()
+        // Remove from local state immediately for instant UI feedback
+        setIssues(prev => prev.filter(issue => issue.id !== id))
       }
     } catch (error) {
       console.error('Error deleting issue:', error)
