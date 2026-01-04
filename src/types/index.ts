@@ -5,6 +5,10 @@ export type { Issue, ActivityLog, Sprint }
 export type IssueStatus = 'OPEN' | 'IN_PROGRESS' | 'DONE';
 export type IssuePriority = 'LOW' | 'MEDIUM' | 'HIGH';
 
+// Arrays for runtime validation
+export const ISSUE_STATUSES: IssueStatus[] = ['OPEN', 'IN_PROGRESS', 'DONE'];
+export const ISSUE_PRIORITIES: IssuePriority[] = ['LOW', 'MEDIUM', 'HIGH'];
+
 export interface IssueWithActivities extends Issue {
   activities: ActivityLog[]
 }

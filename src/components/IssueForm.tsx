@@ -2,9 +2,10 @@
 
 import { useState } from 'react'
 import { IssuePriority, STORY_POINT_VALUES } from '@/types'
+import SprintSelect from './SprintSelect'
 
 interface IssueFormProps {
-  onSubmit: (data: { title: string; description: string; priority: IssuePriority; storyPoints: number | null }) => Promise<void>
+  onSubmit: (data: { title: string; description: string; priority: IssuePriority; storyPoints: number | null; sprintId: string | null }) => Promise<void>
   onCancel: () => void
 }
 
@@ -13,6 +14,7 @@ export function IssueForm({ onSubmit, onCancel }: IssueFormProps) {
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState<IssuePriority>('MEDIUM')
   const [storyPoints, setStoryPoints] = useState<number | null>(null)
+  const [sprintId, setSprintId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
@@ -32,7 +34,7 @@ export function IssueForm({ onSubmit, onCancel }: IssueFormProps) {
 
     setSaving(true)
     try {
-      await onSubmit({ title, description, priority, storyPoints })
+      await onSubmit({ title, description, priority, storyPoints, sprintId })
     } catch {
       setError('Failed to create issue')
     } finally {
@@ -112,6 +114,16 @@ export function IssueForm({ onSubmit, onCancel }: IssueFormProps) {
               ))}
             </select>
           </div>
+        </div>
+
+        <div>
+          <label htmlFor="sprint" className="label">
+            Sprint
+          </label>
+          <SprintSelect
+            value={sprintId}
+            onChange={setSprintId}
+          />
         </div>
 
         <div className="flex gap-2">

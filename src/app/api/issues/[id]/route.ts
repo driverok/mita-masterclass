@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { issueUpdateSchema, isValidStatusTransition } from '@/lib/validations'
-import { IssueStatus, IssuePriority } from '@prisma/client'
+import { IssueStatus, IssuePriority } from '@/types'
 
 interface RouteParams {
   params: Promise<{ id: string }>
