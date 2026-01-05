@@ -35,12 +35,12 @@ export function IssueCard({
 }: IssueCardProps) {
   const [title, setTitle] = useState(issue.title)
   const [description, setDescription] = useState(issue.description)
-  const [priority, setPriority] = useState<IssuePriority>(issue.priority)
+  const [priority, setPriority] = useState<IssuePriority>(issue.priority as IssuePriority)
   const [storyPoints, setStoryPoints] = useState<number | null>(issue.storyPoints ?? null)
   const [saving, setSaving] = useState(false)
 
   const getNextStatus = (): IssueStatus | null => {
-    const transitions = VALID_STATUS_TRANSITIONS[issue.status]
+    const transitions = VALID_STATUS_TRANSITIONS[issue.status as IssueStatus]
     return transitions?.[0] as IssueStatus | null
   }
 
@@ -62,7 +62,7 @@ export function IssueCard({
   const handleCancel = () => {
     setTitle(issue.title)
     setDescription(issue.description)
-    setPriority(issue.priority)
+    setPriority(issue.priority as IssuePriority)
     setStoryPoints(issue.storyPoints ?? null)
     onCancelEdit()
   }
@@ -141,7 +141,7 @@ export function IssueCard({
           <div className="flex items-center gap-2 mb-2">
             <h3 className="text-lg font-medium text-gray-900">{issue.title}</h3>
             <span className={`badge-${issue.priority.toLowerCase()}`}>
-              {priorityLabels[issue.priority]}
+              {priorityLabels[issue.priority as IssuePriority]}
             </span>
             {issue.storyPoints && (
               <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
@@ -154,7 +154,7 @@ export function IssueCard({
             <span
               className={`badge-${issue.status === 'IN_PROGRESS' ? 'in-progress' : issue.status.toLowerCase()}`}
             >
-              {statusLabels[issue.status]}
+              {statusLabels[issue.status as IssueStatus]}
             </span>
             <span className="text-gray-400">
               Created {new Date(issue.createdAt).toLocaleDateString()}
