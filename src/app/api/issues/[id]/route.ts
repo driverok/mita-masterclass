@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { issueUpdateSchema, isValidStatusTransition } from '@/lib/validations'
-import { IssueStatus, IssuePriority } from '@prisma/client'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -147,8 +146,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         data: {
           ...(title && { title }),
           ...(description && { description }),
-          ...(status && { status: status as IssueStatus }),
-          ...(priority && { priority: priority as IssuePriority }),
+          ...(status && { status }),
+          ...(priority && { priority }),
           ...(storyPoints !== undefined && { storyPoints }),
           ...(sprintId !== undefined && { sprintId }),
           ...(completedAt !== undefined && { completedAt }),

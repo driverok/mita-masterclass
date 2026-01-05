@@ -3,7 +3,13 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { issueCreateSchema } from '@/lib/validations'
-import { IssueStatus, IssuePriority } from '@prisma/client'
+
+// Valid status and priority values
+const VALID_STATUSES = ['OPEN', 'IN_PROGRESS', 'DONE'] as const
+const VALID_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH'] as const
+
+type IssueStatus = typeof VALID_STATUSES[number]
+type IssuePriority = typeof VALID_PRIORITIES[number]
 
 // GET /api/issues - List issues for current user with optional filters
 export async function GET(request: NextRequest) {
@@ -23,17 +29,17 @@ export async function GET(request: NextRequest) {
 
     const where: {
       userId: string
-      status?: IssueStatus
-      priority?: IssuePriority
+      status?: string
+      priority?: string
     } = {
       userId: session.user.id,
     }
 
-    if (status && Object.values(IssueStatus).includes(status)) {
+    if (status && VALID_STATUSES.includes(status)) {
       where.status = status
     }
 
-    if (priority && Object.values(IssuePriority).includes(priority)) {
+    if (priority && VALID_PRIORITIES.includes(priority)) {
       where.priority = priority
     }
 
@@ -87,7 +93,7 @@ export async function POST(request: NextRequest) {
       data: {
         title,
         description,
-        priority: priority as IssuePriority,
+        priority: priority ?? 'MEDIUM',
         storyPoints: storyPoints ?? null,
         userId: session.user.id,
       },
