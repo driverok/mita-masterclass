@@ -159,7 +159,7 @@ export default function IssuesPage() {
           <h2 className="text-lg font-semibold text-gray-900">Your Issues</h2>
           <button
             onClick={() => setShowForm(true)}
-            className="btn-primary"
+            className="px-4 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-green-600 text-white hover:bg-green-700 focus:ring-green-500"
           >
             + New Issue
           </button>
