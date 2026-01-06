@@ -106,7 +106,7 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           show_full_output: true
           claude_args: |
-            --mcp-config '{"mcpServers":{"playwright":{"command":"npx","args":["@playwright/mcp@latest","--headless"]}}}'
+            --mcp-config '{"mcpServers":{"playwright":{"command":"npx","args":["@playwright/mcp@latest","--headless"]},"github":{"command":"npx","args":["-y","@modelcontextprotocol/server-github"],"env":{"GITHUB_PERSONAL_ACCESS_TOKEN":"${{ secrets.GITHUB_TOKEN }}"}}}}'
           prompt: |
             # Visual QA Review for PR #${{ github.event.issue.number }}
 
@@ -133,8 +133,7 @@ jobs:
 
             ## Step 3: Post Visual QA Report
 
-            CRITICAL: You MUST use the `mcp__github__add_issue_comment` tool to post your report.
-            Do NOT use Bash, shell commands, or gh CLI - they do not have authentication in this environment.
+            Use the `mcp__github__add_issue_comment` tool to post your report.
 
             Use mcp__github__add_issue_comment with these parameters:
             - owner: "driverok"
