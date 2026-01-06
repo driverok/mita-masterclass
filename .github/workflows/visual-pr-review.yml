@@ -1,23 +1,23 @@
-name: Claude Visual QA Review
+# Claude PR Review Commands
+# Two commands for PR review:
+# - @claude /review - Code review with detailed findings
+# - @claude /visual - Visual QA on Vercel preview with Playwright MCP
+
+name: Claude PR Review
 
 on:
-  # Trigger on label - more controlled than auto-trigger
-  pull_request:
-    types: [labeled]
-  # Also allow manual trigger via comment
   issue_comment:
     types: [created]
 
 jobs:
-  visual-qa:
-    # Run when 'qa-verify' label added OR '@claude /visual' mentioned
+  # ============================================
+  # @claude /review - Code Review
+  # ============================================
+  code-review:
     if: |
-      (github.event_name == 'pull_request' &&
-       github.event.label.name == 'qa-verify') ||
-      (github.event_name == 'issue_comment' &&
-       github.event.issue.pull_request &&
-       contains(github.event.comment.body, '@claude') &&
-       contains(github.event.comment.body, '/visual'))
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '@claude') &&
+      contains(github.event.comment.body, '/review')
     runs-on: ubuntu-latest
 
     permissions:
@@ -29,43 +29,114 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref || github.head_ref }}
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Run Claude Code Review
+        uses: anthropics/claude-code-action@v1
         with:
-          node-version: '20'
-          cache: 'npm'
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          model: claude-sonnet-4-20250514
+          allowed_tools: |
+            Read
+            Glob
+            Grep
+            mcp__github__pull_request_read
+            mcp__github__pull_request_review_write
+            mcp__github__add_comment_to_pending_review
+            mcp__github__add_issue_comment
+          prompt: |
+            # Code Review for PR #${{ github.event.issue.number }}
 
-      - name: Install dependencies
-        run: npm ci
+            First, read .github/CLAUDE.md for review guidelines.
 
-      - name: Setup database
-        run: |
-          npx prisma generate
-          npx prisma db push
+            ## Your Task
+            Perform a thorough code review of this pull request.
 
-      - name: Create artifacts directory
-        run: mkdir -p ./qa-artifacts
+            ### Step 1: Get PR Information
+            Use mcp__github__pull_request_read to get:
+            - PR diff and changed files
+            - PR description and context
 
-      - name: Start dev server
-        run: |
-          npm run dev &
-          # Wait for server to be ready
-          sleep 15
-          # Verify server is running
-          curl -s http://localhost:3000 > /dev/null || echo "Server check failed"
+            ### Step 2: Review Categories
+            Check for issues in these categories (in priority order):
+            - **[SECURITY]** - Exposed secrets, input validation, XSS, auth bypass
+            - **[ERROR]** - Graceful failures, error messages, error boundaries
+            - **[TYPES]** - TypeScript types, no `any`, proper interfaces
+            - **[TESTS]** - New code has tests, existing tests pass
+            - **[PERF]** - N+1 queries, unnecessary re-renders, memory leaks
+            - **[A11Y]** - Accessibility: labels, keyboard nav, ARIA
+
+            ### Step 3: Create Review
+            Create inline comments for specific issues using:
+            - mcp__github__pull_request_review_write (method: create)
+            - mcp__github__add_comment_to_pending_review
+
+            ### Step 4: Post Summary
+            Post a summary comment with this format:
+
+            ## Code Review Summary
+
+            ### Files Reviewed
+            [List of files with brief notes]
+
+            ### Findings
+
+            #### Security
+            - [Finding or "No issues found"]
+
+            #### Error Handling
+            - [Finding or "No issues found"]
+
+            #### TypeScript
+            - [Finding or "No issues found"]
+
+            #### Tests
+            - [Finding or "No issues found"]
+
+            #### Performance
+            - [Finding or "No issues found"]
+
+            #### Accessibility
+            - [Finding or "No issues found"]
+
+            ### Verdict: [APPROVE | REQUEST_CHANGES | COMMENT]
+
+            Be constructive and specific. Explain the "why" behind suggestions.
+
+  # ============================================
+  # @claude /visual - Visual QA on Vercel Preview
+  # ============================================
+  visual-review:
+    if: |
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '@claude') &&
+      contains(github.event.comment.body, '/visual')
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Wait for Vercel Preview
+        uses: patrickedqvist/wait-for-vercel-preview@v1.3.2
+        id: wait-for-vercel
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          max_timeout: 600
+          check_interval: 15
 
       - name: Run Claude Visual QA
         uses: anthropics/claude-code-action@v1
-        env:
-          QA_ARTIFACTS_DIR: ${{ github.workspace }}/qa-artifacts
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           model: claude-sonnet-4-20250514
           claude_args: |
-            --mcp-config '{"mcpServers":{"playwright":{"command":"npx","args":["@playwright/mcp@latest","--headless","--viewport-size=1280x720","--save-trace","--save-session"]}}}'
+            --mcp-config '{"mcpServers":{"playwright":{"command":"npx","args":["@playwright/mcp@latest","--headless"]}}}'
           allowed_tools: |
             mcp__playwright__browser_navigate
             mcp__playwright__browser_click
@@ -74,102 +145,87 @@ jobs:
             mcp__playwright__browser_resize
             mcp__playwright__browser_snapshot
             mcp__playwright__browser_wait
-            Read
-            Glob
-            Grep
+            mcp__github__add_issue_comment
           prompt: |
-            First, read .github/CLAUDE.md for CI/CD specific instructions.
+            # Visual QA Review for PR #${{ github.event.issue.number }}
 
-            # Visual QA Review for PR #${{ github.event.pull_request.number || github.event.issue.number }}
+            You are a QA engineer performing visual testing on a Vercel preview deployment.
 
-            You are an AI QA Engineer. Your job is to test the UI through the browser,
-            like a real user would. You can only see the UI - not the source code.
+            **Preview URL:** ${{ steps.wait-for-vercel.outputs.url }}
 
-            **Test URL:** http://localhost:3000
+            ## Step 1: Login to the Application
 
-            ## QA Testing Instructions
+            1. Navigate to ${{ steps.wait-for-vercel.outputs.url }}/login
+            2. Wait for the page to load
+            3. Use browser_snapshot to see the login form
+            4. Type "demo" in the username field (id="username")
+            5. Type "demo123" in the password field (id="password")
+            6. Click the "Sign in" button
+            7. Wait for redirect to /issues page
+            8. Verify you are logged in by checking the page content
 
-            ### 1. Navigate and Test Main Flows
-            Navigate to http://localhost:3000 and test these user flows:
-            - Login page: Check form layout, input fields, buttons
-            - Dashboard: Check issue list display, filtering
-            - Issue creation/editing if accessible
+            ## Step 2: Screenshot Dashboard at 3 Viewports
 
-            ### 2. Take Screenshots at Each Viewport
-            For EACH page you test, capture screenshots:
+            Take screenshots of the /issues dashboard at three viewport sizes:
 
             **Desktop (1280x720):**
-            - Use browser_take_screenshot tool
-            - Note: screenshots are saved automatically
+            1. browser_resize to width=1280, height=720
+            2. browser_take_screenshot
+            3. Note any layout issues
 
             **Tablet (768x1024):**
-            - First resize: browser_resize to 768x1024
-            - Then screenshot
+            1. browser_resize to width=768, height=1024
+            2. browser_take_screenshot
+            3. Note responsive behavior
 
             **Mobile (375x667):**
-            - Resize: browser_resize to 375x667
-            - Then screenshot
+            1. browser_resize to width=375, height=667
+            2. browser_take_screenshot
+            3. Note mobile-specific issues
 
-            ### 3. Check for Issues
+            ## Step 3: Check for Visual Issues
+
             At each viewport, verify:
-            - ✅ Elements don't overflow horizontally
-            - ✅ Text is readable (not truncated badly)
-            - ✅ Buttons/links are clickable
-            - ✅ Forms are usable
-            - ✅ No console errors visible
+            - Elements don't overflow horizontally
+            - Text is readable (not badly truncated)
+            - Buttons and links are visible and clickable
+            - Forms are usable
+            - Navigation is accessible
+            - Cards and lists display correctly
 
-            ### 4. Document Everything
-            After testing, report:
+            ## Step 4: Post Visual QA Report
 
-            ## 📱 Visual QA Report
+            Post a comment on the PR with this format:
+
+            ## Visual QA Report
+
+            **Preview URL:** ${{ steps.wait-for-vercel.outputs.url }}
+            **Login:** Successful with demo/demo123
 
             ### Screenshots Captured
-            - List each screenshot taken with description
+
+            | Viewport | Size | Status |
+            |----------|------|--------|
+            | Desktop | 1280x720 | [OK/Issues] |
+            | Tablet | 768x1024 | [OK/Issues] |
+            | Mobile | 375x667 | [OK/Issues] |
 
             ### Desktop (1280px) Findings
-            - What works / what's broken
+            - [What works / what's broken]
 
             ### Tablet (768px) Findings
-            - What works / what's broken
+            - [What works / what's broken]
 
             ### Mobile (375px) Findings
-            - What works / what's broken
+            - [What works / what's broken]
 
             ### Issues Found
-            For each issue use format:
-            - ❌ [VISUAL] Description of issue
+            For each issue:
+            - [VISUAL] Description of issue
             - Location: Page/component affected
             - Severity: Critical/High/Medium/Low
 
             ### Recommendation
-            - APPROVE: No visual issues found
-            - REQUEST_CHANGES: Critical issues need fixing
-            - COMMENT: Minor issues noted
+            [APPROVE | REQUEST_CHANGES | COMMENT]
 
-            **Important:** Continue testing even if you find bugs. Document ALL issues.
-
-      - name: Upload QA Artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: visual-qa-artifacts-pr-${{ github.event.pull_request.number || github.event.issue.number }}
-          path: |
-            ./qa-artifacts/
-            ~/.cache/ms-playwright/
-          retention-days: 14
-          if-no-files-found: warn
-
-      - name: Comment artifact link on PR
-        if: always()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const prNumber = context.payload.pull_request?.number || context.payload.issue?.number;
-            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-              body: `## 📸 Visual QA Artifacts\n\nScreenshots and traces from this QA run are available as artifacts:\n\n🔗 [View Artifacts](${runUrl}#artifacts)\n\nDownload the \`visual-qa-artifacts-pr-${prNumber}\` artifact to review screenshots and Playwright traces.`
-            });
+            **Important:** Continue testing even if you find issues. Document ALL findings.

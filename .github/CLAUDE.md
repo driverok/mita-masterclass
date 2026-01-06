@@ -12,8 +12,9 @@ This marker confirms this CI/CD configuration is active.
 | Command | Description | Use Case |
 |---------|-------------|----------|
 | `@claude` | General assistance | Any question or task |
+| `@claude /review` | Code review with detailed findings | PR needs code review |
+| `@claude /visual` | Visual QA on Vercel preview (screenshots at 3 viewports) | PR needs visual testing |
 | `/fix` | Auto-fix an issue | Issue has clear requirements |
-| `/review` | Code review | PR needs review |
 | `/explain` | Explain code | Understanding codebase |
 | `/help` | Show commands | Need help |
 
@@ -203,31 +204,46 @@ Before approving any PR, verify:
 ## 🎭 Visual QA Testing (Playwright MCP)
 
 ### When to Trigger:
-- Add label `qa-verify` to PR
-- Or comment `@claude /visual` on PR
+- Comment `@claude /visual` on a PR
+
+### Prerequisites:
+- Vercel preview deployment must be ready (workflow waits up to 10 minutes)
+- PR must be open with changes deployed to Vercel
 
 ### What Claude Does:
-1. Starts dev server locally (http://localhost:3000)
-2. Uses Playwright MCP in headless mode
-3. Tests UI at 3 viewports: Desktop (1280px), Tablet (768px), Mobile (375px)
-4. Takes screenshots at each viewport
-5. Posts findings to PR with artifact link
+1. Waits for Vercel preview deployment to be ready
+2. Navigates to the Vercel preview URL
+3. **Logs in** with demo credentials (username: `demo`, password: `demo123`)
+4. Uses Playwright MCP in headless mode
+5. Takes screenshots of the dashboard at 3 viewports:
+   - Desktop (1280x720)
+   - Tablet (768x1024)
+   - Mobile (375x667)
+6. Posts Visual QA Report to PR
 
 ### QA Report Format:
 ```markdown
-## 📱 Visual QA Report
+## Visual QA Report
+
+**Preview URL:** [Vercel preview URL]
+**Login:** Successful with demo/demo123
 
 ### Screenshots Captured
-- [List of screenshots with descriptions]
+
+| Viewport | Size | Status |
+|----------|------|--------|
+| Desktop | 1280x720 | [OK/Issues] |
+| Tablet | 768x1024 | [OK/Issues] |
+| Mobile | 375x667 | [OK/Issues] |
 
 ### Desktop (1280px) Findings
-- ✅ or ❌ findings
+- [What works / what's broken]
 
 ### Tablet (768px) Findings
-- ✅ or ❌ findings
+- [What works / what's broken]
 
 ### Mobile (375px) Findings
-- ✅ or ❌ findings
+- [What works / what's broken]
 
 ### Issues Found
 - ❌ [VISUAL] Issue description
@@ -238,10 +254,10 @@ Before approving any PR, verify:
 ```
 
 ### Key Points:
+- Tests on actual Vercel preview (not localhost)
+- Auto-logs in with demo credentials
 - Claude tests like a real user (black-box testing)
 - Continues testing even after finding bugs
-- Screenshots saved as GitHub Actions artifacts
-- Traces available for debugging
 
 ---
 

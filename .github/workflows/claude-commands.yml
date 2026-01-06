@@ -57,52 +57,6 @@ jobs:
             
             Be thorough but focused. Only change what's necessary.
 
-  # /review - Claude will review code (for PRs only)
-  review-command:
-    if: |
-      (github.event_name == 'issue_comment' && 
-       github.event.issue.pull_request &&
-       contains(github.event.comment.body, '/review')) ||
-      (github.event_name == 'pull_request_review_comment' &&
-       contains(github.event.comment.body, '/review'))
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-20250514
-          allowed_tools: |
-            Read
-            Glob
-            Grep
-            mcp__github__pull_request_read
-            mcp__github__pull_request_review_write
-            mcp__github__add_comment_to_pending_review
-          prompt: |
-            # /review Command - Code Review Mode
-            
-            Read .github/CLAUDE.md for review guidelines, then:
-            
-            1. Get the PR diff and changed files
-            2. Review for:
-               - [SECURITY] Security vulnerabilities
-               - [CODE] Code quality and patterns
-               - [TYPES] TypeScript correctness
-               - [PERF] Performance issues
-               - [TEST] Test coverage
-            3. Create a thorough review with inline comments
-            4. Summarize your findings
-            5. Recommend: APPROVE, REQUEST_CHANGES, or COMMENT
-            
-            Be constructive and specific. Explain the "why" behind suggestions.
-
   # /explain - Claude will explain the code (read-only)
   explain-command:
     if: |
@@ -159,19 +113,21 @@ jobs:
             mcp__github__add_issue_comment
           prompt: |
             Post a comment listing available Claude commands:
-            
+
             ## 🤖 Claude Commands
-            
+
             | Command | Description | Where |
             |---------|-------------|-------|
             | `@claude` | General assistance - Claude will help based on context | Issues, PRs |
+            | `@claude /review` | Code review with detailed findings | PRs only |
+            | `@claude /visual` | Visual QA on Vercel preview (screenshots at 3 viewports) | PRs only |
             | `/fix` | Analyze issue and create a PR with the fix | Issues only |
-            | `/review` | Perform detailed code review | PRs only |
             | `/explain` | Explain how code works (read-only) | Issues, PRs |
             | `/help` | Show this help message | Anywhere |
-            
+
             ### Tips
             - Be specific in your requests
             - For `/fix`, ensure the issue has clear requirements
-            - For `/review`, mention specific areas of concern
+            - For `@claude /review`, mention specific areas of concern
+            - For `@claude /visual`, ensure Vercel preview is deployed first
             - For `/explain`, ask about specific files or functions
