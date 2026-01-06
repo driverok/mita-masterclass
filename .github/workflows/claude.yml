@@ -36,20 +36,10 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-20250514
-          # Enable tools Claude needs for issue resolution
-          allowed_tools: |
-            mcp__github__create_branch
-            mcp__github__create_pull_request
-            mcp__github__add_issue_comment
-            mcp__github__push_files
-            Bash(git *)
-            Bash(npm *)
-            Read
-            Edit
-            Write
-            Glob
-            Grep
+          # Use claude_args for model and tool configuration
+          claude_args: |
+            --model claude-sonnet-4-20250514
+            --allowedTools "Bash(git *),Bash(npm *),Read,Edit,Write,Glob,Grep,mcp__github"
           prompt: |
             First, read .github/CLAUDE.md for CI/CD specific instructions.
             Then read the root CLAUDE.md for project conventions.
@@ -61,5 +51,5 @@ jobs:
             - Ref: ${{ github.ref }}
             
             ## Your Task
-            Respond to the @claude mention by following the instructions in .github/CLAUDE.md.
-            Always acknowledge the request and explain what you're doing.
+            Respond to the @claude mention. Always post a response comment explaining what you did or found.
+            Follow the instructions in .github/CLAUDE.md based on the request type.

@@ -29,19 +29,10 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-20250514
-          allowed_tools: |
-            mcp__github__create_branch
-            mcp__github__create_pull_request
-            mcp__github__push_files
-            mcp__github__add_issue_comment
-            Bash(git *)
-            Bash(npm *)
-            Read
-            Edit
-            Write
-            Glob
-            Grep
+          trigger_phrase: "/fix"
+          claude_args: |
+            --model claude-sonnet-4-20250514
+            --allowedTools "Bash(git *),Bash(npm *),Read,Edit,Write,Glob,Grep,mcp__github"
           prompt: |
             # /fix Command - Issue Resolution Mode
             
@@ -77,14 +68,10 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-20250514
-          allowed_tools: |
-            Read
-            Glob
-            Grep
-            mcp__github__pull_request_read
-            mcp__github__pull_request_review_write
-            mcp__github__add_comment_to_pending_review
+          trigger_phrase: "/review"
+          claude_args: |
+            --model claude-sonnet-4-20250514
+            --allowedTools "Read,Glob,Grep,mcp__github"
           prompt: |
             # /review Command - Code Review Mode
             
@@ -119,12 +106,10 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-20250514
-          allowed_tools: |
-            Read
-            Glob
-            Grep
-            mcp__github__add_issue_comment
+          trigger_phrase: "/explain"
+          claude_args: |
+            --model claude-sonnet-4-20250514
+            --allowedTools "Read,Glob,Grep,mcp__github"
           prompt: |
             # /explain Command - Code Explanation Mode
             
@@ -154,11 +139,11 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-20250514
-          allowed_tools: |
-            mcp__github__add_issue_comment
+          trigger_phrase: "/help"
+          claude_args: |
+            --model claude-sonnet-4-20250514
           prompt: |
-            Post a comment listing available Claude commands:
+            Post a helpful comment listing available Claude commands:
             
             ## 🤖 Claude Commands
             
