@@ -1,7 +1,5 @@
-# Claude Code - Interactive Mode
+# Claude Code - Interactive Mode with Custom Instructions
 # Based on: https://github.com/anthropics/claude-code-action/blob/main/examples/claude.yml
-#
-# IMPORTANT: Do NOT add 'prompt' here - it disables interactive comment mode!
 
 name: Claude Code
 
@@ -42,4 +40,6 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # NO prompt = interactive mode = auto-responds to @claude
+          # Enforce custom greeting from .github/CLAUDE.md
+          claude_args: |
+            --system-prompt "IMPORTANT: Always start EVERY response with exactly: '👋 Hello Movella Team!' on its own line. This confirms the CI/CD configuration is active. Then read and follow all instructions in .github/CLAUDE.md."
