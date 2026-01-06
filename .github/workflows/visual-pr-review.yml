@@ -1,0 +1,110 @@
+name: Claude Visual PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  issue_comment:
+    types: [created]
+
+jobs:
+  visual-review:
+    # Run on PR events OR when @claude is mentioned in PR comments
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issue_comment' && 
+       github.event.issue.pull_request &&
+       contains(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get Vercel Preview URL
+        id: vercel
+        run: |
+          # Wait for Vercel deployment to be ready
+          sleep 30
+          # Get preview URL from Vercel (adjust for your setup)
+          echo "preview_url=https://${{ github.event.pull_request.head.ref }}-${{ github.repository_owner }}.vercel.app" >> $GITHUB_OUTPUT
+
+      - name: Create screenshots directory
+        run: mkdir -p ./screenshots
+
+      - name: Run Claude Visual Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          model: claude-sonnet-4-20250514
+          mcp_config: |
+            {
+              "mcpServers": {
+                "playwright": {
+                  "command": "npx",
+                  "args": ["@playwright/mcp@latest", "--vision"]
+                }
+              }
+            }
+          prompt: |
+            You are reviewing PR #${{ github.event.pull_request.number }} for the MITA issue tracker app.
+            
+            Vercel Preview URL: ${{ steps.vercel.outputs.preview_url }}
+            
+            ## PHASE 1 - CODE REVIEW
+            Review the code changes for:
+            - Security vulnerabilities
+            - Error handling
+            - TypeScript type safety
+            - Test coverage
+            - Code style consistency
+            
+            ## PHASE 2 - VISUAL REVIEW WITH SCREENSHOTS
+            Use Playwright to navigate to the Vercel preview URL and take screenshots:
+            
+            1. **Desktop View (1280px width)**:
+               - Navigate to the main pages affected by this PR
+               - Take a screenshot named "desktop-view.png"
+               
+            2. **Tablet View (768px width)**:
+               - Resize viewport to 768px
+               - Take a screenshot named "tablet-view.png"
+               
+            3. **Mobile View (375px width)**:
+               - Resize viewport to 375px
+               - Take a screenshot named "mobile-view.png"
+            
+            For each viewport, check:
+            - Does the UI render correctly?
+            - Are there any layout issues or overflow?
+            - Are all elements visible and accessible?
+            - Do interactive elements work?
+            
+            ## REPORT FORMAT
+            Structure your review as:
+            
+            ### Code Review
+            - List findings with ✅ for pass, ⚠️ for warnings, ❌ for issues
+            - Tag code issues with [CODE]
+            
+            ### Visual Review
+            - Include the screenshots you captured
+            - Tag visual issues with [VISUAL]
+            - For each viewport, describe what you observed
+            
+            ### Summary
+            - Overall recommendation: APPROVE, REQUEST_CHANGES, or COMMENT
+
+      - name: Upload Screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-review-screenshots
+          path: ./screenshots/
+          retention-days: 7
