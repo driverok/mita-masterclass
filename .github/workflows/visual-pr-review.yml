@@ -25,9 +25,9 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Playwright and browsers
+      - name: Install Playwright MCP and browsers
         run: |
-          npm install -g @playwright/mcp@latest
+          npm install -g @anthropic-ai/mcp-server-playwright
           npx playwright install chromium
           npx playwright install-deps chromium
 
@@ -41,7 +41,8 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          claude_args: '--mcp-config ''{"mcpServers":{"playwright":{"command":"npx","args":["@playwright/mcp@latest","--headless"]}}}'''
+          show_full_output: true
+          claude_args: '--mcp-config ''{"mcpServers":{"playwright":{"command":"npx","args":["-y","@anthropic-ai/mcp-server-playwright"]}}}'''
           prompt: |
             Take screenshots of this Vercel preview at 3 viewports.
             
