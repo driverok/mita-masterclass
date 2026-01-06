@@ -4,7 +4,7 @@
 MITA (Mini Issue Tracker Application) is a demo app for Claude Code Masterclass Series.
 
 > **📁 Additional CLAUDE.md files:**
-> - `.claude/CLAUDE.md` - CI/CD specific rules (issue handling, PR review, CI failures)
+> - `.github/CLAUDE.md` - CI/CD specific rules (issue handling, PR review, CI failures)
 
 ---
 
