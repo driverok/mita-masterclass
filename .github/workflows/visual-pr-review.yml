@@ -105,6 +105,12 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           show_full_output: true
+          allowed_tools: |
+            mcp__playwright__*
+            mcp__github__add_issue_comment
+            Read
+            Glob
+            Grep
           claude_args: |
             --mcp-config '{"mcpServers":{"playwright":{"command":"npx","args":["@playwright/mcp@latest","--headless"]}}}'
           prompt: |
@@ -133,4 +139,11 @@ jobs:
 
             ## Step 3: Post Visual QA Report
 
-            Post a comment with findings for each viewport, issues found, and recommendation (APPROVE/REQUEST_CHANGES/COMMENT).
+            IMPORTANT: Use the `mcp__github__add_issue_comment` tool to post your report.
+            Do NOT use Bash or gh CLI commands - they will not work in this environment.
+
+            Post a comment to issue #${{ github.event.issue.number }} with:
+            - Findings for each viewport (Desktop, Tablet, Mobile)
+            - Any visual issues found (layout breaks, overflow, accessibility)
+            - Screenshots description (what was captured)
+            - Recommendation: APPROVE, REQUEST_CHANGES, or COMMENT
