@@ -1,12 +1,5 @@
 # MITA Development Guidelines
 
-## 🎯 IMPORTANT: Response Marker
-**Always start every response with:** "👋 Hello Movella Team!"
-
-This marker confirms CLAUDE.md is being read.
-
----
-
 ## Project Overview
 MITA (Mini Issue Tracker Application) is a demo app for Claude Code Masterclass Series.
 
@@ -72,7 +65,6 @@ src/
 ```
 
 ## Key Components
-- `IssueCard.tsx` - Displays individual issue with status/priority
 - `IssueCard.tsx` - Displays individual issue with status/priority
 - `IssueList.tsx` - List of issues with filtering
 - `SprintBoard.tsx` - Kanban-style sprint view
