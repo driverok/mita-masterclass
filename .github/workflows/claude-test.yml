@@ -1,5 +1,5 @@
-# Minimal Claude workflow for testing
-# Use: comment '/test-claude' on any issue
+# Minimal test workflow - Interactive mode (no prompt)
+# Use: comment '@claude hello' on any issue to test
 
 name: Claude Test
 
@@ -9,31 +9,22 @@ on:
 
 jobs:
   test:
-    if: contains(github.event.comment.body, '/test-claude')
+    if: |
+      github.event_name == 'issue_comment' && 
+      contains(github.event.comment.body, '@claude')
     runs-on: ubuntu-latest
     permissions:
       contents: read
       issues: write
       pull-requests: write
+      id-token: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
 
-      - name: Run Claude (minimal config)
-        uses: anthropics/claude-code-action@v1
+      # NO prompt = interactive mode = auto-responds to @claude
+      - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          trigger_phrase: "/test-claude"
-          prompt: |
-            This is a test. Simply respond with:
-            
-            "👋 Hello! Claude is working correctly.
-            
-            - Trigger: /test-claude
-            - Issue: #${{ github.event.issue.number }}
-            - User: @${{ github.actor }}
-            - Time: $(date)
-            
-            Configuration is correct!"
-            
-            Post this as a comment on the issue.

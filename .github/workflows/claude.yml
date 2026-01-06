@@ -1,55 +1,53 @@
+# Claude Code - Interactive Mode
+# Based on official example: https://github.com/anthropics/claude-code-action/blob/main/examples/claude.yml
+#
+# IMPORTANT: Do NOT add 'prompt' input here - it disables interactive comment mode!
+# Claude will automatically read CLAUDE.md files and respond to @claude mentions.
+
 name: Claude Code
 
 on:
-  issues:
-    types: [opened, edited]
   issue_comment:
     types: [created]
   pull_request_review_comment:
     types: [created]
-  pull_request:
-    types: [opened, synchronize]
+  pull_request_review:
+    types: [submitted]
+  issues:
+    types: [opened, assigned]
 
 jobs:
   claude:
-    # Properly check for @claude mention based on event type
     if: |
-      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude')) ||
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '@claude'))
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
-      issues: write
       pull-requests: write
+      issues: write
       id-token: write
+      actions: read  # Required for Claude to read CI results on PRs
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Run Claude Code
+        id: claude
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          # Use claude_args for model and tool configuration
-          claude_args: |
-            --model claude-sonnet-4-20250514
-            --allowedTools "Bash(git *),Bash(npm *),Read,Edit,Write,Glob,Grep,mcp__github"
-          prompt: |
-            First, read .github/CLAUDE.md for CI/CD specific instructions.
-            Then read the root CLAUDE.md for project conventions.
-            
-            ## Context
-            - Repository: ${{ github.repository }}
-            - Event: ${{ github.event_name }}
-            - Actor: ${{ github.actor }}
-            - Ref: ${{ github.ref }}
-            
-            ## Your Task
-            Respond to the @claude mention. Always post a response comment explaining what you did or found.
-            Follow the instructions in .github/CLAUDE.md based on the request type.
+          
+          # Optional: Customize trigger phrase (default: @claude)
+          # trigger_phrase: "@claude"
+          
+          # Optional: Configure Claude's behavior
+          # claude_args: |
+          #   --model claude-sonnet-4-20250514
+          #   --allowedTools "Bash(npm *),Read,Edit,Write"

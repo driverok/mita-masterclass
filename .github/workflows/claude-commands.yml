@@ -1,162 +1,142 @@
-# Demo: Custom Claude Commands
-# This workflow shows how to create different trigger phrases for different actions
+# Custom Claude Commands - Automation Mode
+# These use 'prompt' for specific tasks, with 'track_progress: true' for comments
 
 name: Claude Commands
 
 on:
   issue_comment:
     types: [created]
-  pull_request_review_comment:
-    types: [created]
 
 jobs:
   # /fix - Claude will attempt to fix the issue and create a PR
   fix-command:
     if: |
-      (github.event_name == 'issue_comment' && 
-       !github.event.issue.pull_request &&
-       contains(github.event.comment.body, '/fix'))
+      github.event_name == 'issue_comment' && 
+      !github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/fix')
     runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: write
       pull-requests: write
       id-token: write
+      actions: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          fetch-depth: 1
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           trigger_phrase: "/fix"
+          track_progress: true  # Enable progress comments in automation mode
           claude_args: |
             --model claude-sonnet-4-20250514
-            --allowedTools "Bash(git *),Bash(npm *),Read,Edit,Write,Glob,Grep,mcp__github"
           prompt: |
-            # /fix Command - Issue Resolution Mode
+            You received a /fix command on issue #${{ github.event.issue.number }}.
             
-            Read .github/CLAUDE.md for instructions, then:
-            
-            1. Analyze issue #${{ github.event.issue.number }} thoroughly
-            2. Explore the codebase to understand the problem
-            3. Implement a fix following project conventions
-            4. Run tests with `npm test` and lint with `npm run lint`
-            5. Create a branch: `fix/issue-${{ github.event.issue.number }}`
-            6. Create a PR that references this issue
-            7. Comment on this issue with a summary of your fix
-            
-            Be thorough but focused. Only change what's necessary.
+            Your task:
+            1. Read the issue thoroughly
+            2. Analyze the codebase to understand the problem
+            3. Implement a fix following project conventions in CLAUDE.md
+            4. Run `npm run lint` and `npm test` to verify
+            5. Create a branch named `fix/issue-${{ github.event.issue.number }}`
+            6. Commit and push your changes
+            7. Create a PR that references this issue with "Fixes #${{ github.event.issue.number }}"
 
-  # /review - Claude will review code (for PRs only)
+  # /review - Code review for PRs
   review-command:
     if: |
-      (github.event_name == 'issue_comment' && 
-       github.event.issue.pull_request &&
-       contains(github.event.comment.body, '/review')) ||
-      (github.event_name == 'pull_request_review_comment' &&
-       contains(github.event.comment.body, '/review'))
+      github.event_name == 'issue_comment' && 
+      github.event.issue.pull_request &&
+      contains(github.event.comment.body, '/review')
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
       issues: write
+      id-token: write
+      actions: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          fetch-depth: 1
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           trigger_phrase: "/review"
+          track_progress: true
           claude_args: |
             --model claude-sonnet-4-20250514
-            --allowedTools "Read,Glob,Grep,mcp__github"
           prompt: |
-            # /review Command - Code Review Mode
+            You received a /review command. Perform a thorough code review.
             
-            Read .github/CLAUDE.md for review guidelines, then:
+            Check for:
+            - [SECURITY] Security vulnerabilities
+            - [CODE] Code quality and patterns
+            - [TYPES] TypeScript correctness  
+            - [PERF] Performance issues
+            - [TEST] Test coverage
             
-            1. Get the PR diff and changed files
-            2. Review for:
-               - [SECURITY] Security vulnerabilities
-               - [CODE] Code quality and patterns
-               - [TYPES] TypeScript correctness
-               - [PERF] Performance issues
-               - [TEST] Test coverage
-            3. Create a thorough review with inline comments
-            4. Summarize your findings
-            5. Recommend: APPROVE, REQUEST_CHANGES, or COMMENT
-            
-            Be constructive and specific. Explain the "why" behind suggestions.
+            Provide constructive feedback with specific file:line references.
+            Recommend: APPROVE, REQUEST_CHANGES, or COMMENT.
 
-  # /explain - Claude will explain the code (read-only)
+  # /explain - Code explanation (read-only)
   explain-command:
-    if: |
-      contains(github.event.comment.body, '/explain')
+    if: contains(github.event.comment.body, '/explain')
     runs-on: ubuntu-latest
     permissions:
       contents: read
       issues: write
       pull-requests: write
+      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          fetch-depth: 1
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           trigger_phrase: "/explain"
-          claude_args: |
-            --model claude-sonnet-4-20250514
-            --allowedTools "Read,Glob,Grep,mcp__github"
+          track_progress: true
           prompt: |
-            # /explain Command - Code Explanation Mode
+            You received an /explain command. Provide a clear explanation.
             
-            You are in READ-ONLY explanation mode. Do NOT make any changes.
+            DO NOT make any code changes - this is read-only.
             
-            1. Read the issue/PR and any specific questions
-            2. Explore the relevant code
-            3. Provide a clear, educational explanation:
-               - What the code does
-               - How it works
-               - Why it's designed this way
-               - Any potential improvements (as suggestions only)
+            Explain:
+            - What the relevant code does
+            - How it works
+            - Why it's designed this way
             
-            Use code snippets and diagrams (mermaid) where helpful.
-            Target your explanation to the asker's apparent skill level.
+            Use code snippets where helpful.
 
-  # /help - Show available commands
+  # /help - Show available commands  
   help-command:
-    if: |
-      contains(github.event.comment.body, '/help')
+    if: contains(github.event.comment.body, '/help')
     runs-on: ubuntu-latest
     permissions:
       issues: write
       pull-requests: write
+      id-token: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           trigger_phrase: "/help"
-          claude_args: |
-            --model claude-sonnet-4-20250514
+          track_progress: true
           prompt: |
-            Post a helpful comment listing available Claude commands:
+            Post a comment with this help information:
             
             ## 🤖 Claude Commands
             
             | Command | Description | Where |
             |---------|-------------|-------|
-            | `@claude` | General assistance - Claude will help based on context | Issues, PRs |
-            | `/fix` | Analyze issue and create a PR with the fix | Issues only |
-            | `/review` | Perform detailed code review | PRs only |
-            | `/explain` | Explain how code works (read-only) | Issues, PRs |
-            | `/help` | Show this help message | Anywhere |
-            
-            ### Tips
-            - Be specific in your requests
-            - For `/fix`, ensure the issue has clear requirements
-            - For `/review`, mention specific areas of concern
-            - For `/explain`, ask about specific files or functions
+            | `@claude` | General assistance | Issues, PRs |
+            | `/fix` | Analyze and fix an issue | Issues only |
+            | `/review` | Detailed code review | PRs only |
+            | `/explain` | Explain code (read-only) | Anywhere |
+            | `/help` | Show this help | Anywhere |
