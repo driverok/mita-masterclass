@@ -20,13 +20,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get Vercel Preview URL
-        id: vercel
+      - name: Wait for Vercel Deployment
         run: |
-          # Wait for Vercel deployment to be ready
-          echo "Waiting 90 seconds for Vercel deployment..."
+          echo "Waiting 90 seconds for Vercel deployment to be ready..."
           sleep 90
-          echo "preview_url=https://mita-git-claude-issue-9-20260106-1450-alehs-projects-e24f2cd1.vercel.app" >> $GITHUB_OUTPUT
 
       - name: Run Claude Visual Review
         uses: anthropics/claude-code-action@v1
@@ -34,47 +31,34 @@ jobs:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: |
-            --model claude-sonnet-4-20250514
-            --mcp-config '{"mcpServers": {"playwright": {"command": "npx", "args": ["-y", "@anthropic-ai/mcp-server-playwright", "--screenshot-path", "./screenshots"]}}}'
-            --allowedTools mcp__playwright__browser_navigate mcp__playwright__browser_screenshot mcp__playwright__browser_resize
+            --mcp-config '{"mcpServers":{"playwright":{"command":"npx","args":["@playwright/mcp@latest","--headless"]}}}'
           prompt: |
-            You are reviewing PR #${{ github.event.pull_request.number }} for the MITA issue tracker app.
+            ## TASK: Take screenshots of the Vercel preview at different viewports
             
-            ## YOUR TASK: VISUAL REVIEW WITH SCREENSHOTS
+            The Vercel preview URL is: https://mita-git-claude-issue-9-20260106-1450-alehs-projects-e24f2cd1.vercel.app
             
-            Use the Playwright MCP tools to take screenshots of the Vercel preview at different viewports.
+            Use the Playwright MCP browser tools to:
             
-            Preview URL: ${{ steps.vercel.outputs.preview_url }}
+            1. Navigate to the preview URL using browser_navigate
+            2. Take a screenshot at DESKTOP viewport (1280x800)
+            3. Resize to TABLET viewport (768x1024) using browser_resize and take screenshot
+            4. Resize to MOBILE viewport (375x667) using browser_resize and take screenshot
             
-            ### Steps:
+            After taking each screenshot, the screenshot will be saved. Include ALL screenshots in your response.
             
-            1. **Desktop View (1280x800)**:
-               - Use browser_navigate to go to the preview URL
-               - Use browser_screenshot to capture the page
-               - Describe what you see
-               
-            2. **Tablet View (768x1024)**:
-               - Use browser_resize to change viewport to 768x1024
-               - Use browser_screenshot to capture the page
-               - Describe what you see
-               
-            3. **Mobile View (375x667)**:
-               - Use browser_resize to change viewport to 375x667
-               - Use browser_screenshot to capture the page
-               - Describe what you see - check for overflow issues
+            Format your response as:
             
-            ### Report Format:
+            ## Visual PR Review - Screenshots
             
-            Post your findings as a PR comment with:
-            - Screenshot images embedded (if possible) or descriptions
-            - ✅ PASS or ❌ FAIL for each viewport
-            - Any visual bugs found (overflow, clipping, layout issues)
-            - Overall recommendation
-
-      - name: Upload Screenshots
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: visual-review-screenshots
-          path: ./screenshots/
-          retention-days: 7
+            ### Desktop (1280x800)
+            [screenshot]
+            
+            ### Tablet (768x1024)  
+            [screenshot]
+            
+            ### Mobile (375x667)
+            [screenshot]
+            
+            ### Summary
+            - Note any visible issues (overflow, clipping, layout problems)
+            - List which viewports look correct
