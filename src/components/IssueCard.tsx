@@ -136,18 +136,22 @@ export function IssueCard({
 
   return (
     <div className="card">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
-            <h3 className="text-lg font-medium text-gray-900">{issue.title}</h3>
-            <span className={`badge-${issue.priority.toLowerCase()}`}>
-              {priorityLabels[issue.priority as IssuePriority]}
-            </span>
-            {issue.storyPoints && (
-              <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
-                {issue.storyPoints} {issue.storyPoints === 1 ? 'pt' : 'pts'}
+      <div className="flex flex-col sm:flex-row items-start gap-3 sm:justify-between">
+        <div className="flex-1 w-full sm:w-auto">
+          <div className="mb-2">
+            <h3 className="text-lg font-medium text-gray-900 truncate mb-2 sm:mb-0">
+              {issue.title}
+            </h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`badge-${issue.priority.toLowerCase()}`}>
+                {priorityLabels[issue.priority as IssuePriority]}
               </span>
-            )}
+              {issue.storyPoints && (
+                <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                  {issue.storyPoints} {issue.storyPoints === 1 ? 'pt' : 'pts'}
+                </span>
+              )}
+            </div>
           </div>
           <p className="text-gray-600 mb-3">{issue.description}</p>
           <div className="flex items-center gap-4 text-sm">
@@ -161,23 +165,23 @@ export function IssueCard({
             </span>
           </div>
         </div>
-        <div className="flex gap-2 ml-4">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto sm:ml-4 mt-3 sm:mt-0">
           {getNextStatus() && (
             <button
               onClick={handleStatusChange}
               disabled={saving}
-              className="btn-primary text-sm"
+              className="btn-primary text-sm whitespace-nowrap"
               title={`Move to ${statusLabels[getNextStatus()!]}`}
             >
               {saving ? '...' : `→ ${statusLabels[getNextStatus()!]}`}
             </button>
           )}
-          <button onClick={onEdit} className="btn-secondary text-sm">
+          <button onClick={onEdit} className="btn-secondary text-sm whitespace-nowrap">
             Edit
           </button>
           <button
             onClick={() => onDelete(issue.id)}
-            className="btn-danger text-sm"
+            className="btn-danger text-sm whitespace-nowrap"
           >
             Delete
           </button>
