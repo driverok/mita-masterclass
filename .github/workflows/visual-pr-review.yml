@@ -30,35 +30,16 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          claude_args: |
-            --mcp-config '{"mcpServers":{"playwright":{"command":"npx","args":["@playwright/mcp@latest","--headless"]}}}'
+          claude_args: '--mcp-config ''{"mcpServers":{"playwright":{"command":"npx","args":["@playwright/mcp@latest","--headless"]}}}'''
           prompt: |
-            ## TASK: Take screenshots of the Vercel preview at different viewports
+            Take screenshots of this Vercel preview URL at 3 viewports and post them here.
             
-            The Vercel preview URL is: https://mita-git-claude-issue-9-20260106-1450-alehs-projects-e24f2cd1.vercel.app
+            URL: https://mita-git-claude-issue-9-20260106-1450-alehs-projects-e24f2cd1.vercel.app
             
-            Use the Playwright MCP browser tools to:
+            Steps:
+            1. Use browser_navigate to go to the URL
+            2. Use browser_screenshot to capture Desktop view
+            3. Use browser_resize to 768x1024, then browser_screenshot for Tablet
+            4. Use browser_resize to 375x667, then browser_screenshot for Mobile
             
-            1. Navigate to the preview URL using browser_navigate
-            2. Take a screenshot at DESKTOP viewport (1280x800)
-            3. Resize to TABLET viewport (768x1024) using browser_resize and take screenshot
-            4. Resize to MOBILE viewport (375x667) using browser_resize and take screenshot
-            
-            After taking each screenshot, the screenshot will be saved. Include ALL screenshots in your response.
-            
-            Format your response as:
-            
-            ## Visual PR Review - Screenshots
-            
-            ### Desktop (1280x800)
-            [screenshot]
-            
-            ### Tablet (768x1024)  
-            [screenshot]
-            
-            ### Mobile (375x667)
-            [screenshot]
-            
-            ### Summary
-            - Note any visible issues (overflow, clipping, layout problems)
-            - List which viewports look correct
+            Post all 3 screenshots in your response with labels.
