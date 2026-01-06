@@ -20,10 +20,21 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright and browsers
+        run: |
+          npm install -g @playwright/mcp@latest
+          npx playwright install chromium
+          npx playwright install-deps chromium
+
       - name: Wait for Vercel Deployment
         run: |
-          echo "Waiting 90 seconds for Vercel deployment to be ready..."
-          sleep 90
+          echo "Waiting 60 seconds for Vercel deployment..."
+          sleep 60
 
       - name: Run Claude Visual Review
         uses: anthropics/claude-code-action@v1
@@ -32,14 +43,13 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           claude_args: '--mcp-config ''{"mcpServers":{"playwright":{"command":"npx","args":["@playwright/mcp@latest","--headless"]}}}'''
           prompt: |
-            Take screenshots of this Vercel preview URL at 3 viewports and post them here.
+            Take screenshots of this Vercel preview at 3 viewports.
             
             URL: https://mita-git-claude-issue-9-20260106-1450-alehs-projects-e24f2cd1.vercel.app
             
-            Steps:
-            1. Use browser_navigate to go to the URL
-            2. Use browser_screenshot to capture Desktop view
-            3. Use browser_resize to 768x1024, then browser_screenshot for Tablet
-            4. Use browser_resize to 375x667, then browser_screenshot for Mobile
+            1. Navigate to the URL with browser_navigate
+            2. Take desktop screenshot with browser_screenshot
+            3. Resize to 768x1024 with browser_resize, take tablet screenshot
+            4. Resize to 375x667 with browser_resize, take mobile screenshot
             
-            Post all 3 screenshots in your response with labels.
+            Include all screenshots in your response.
