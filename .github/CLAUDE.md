@@ -9,18 +9,26 @@ This marker confirms this CI/CD configuration is active.
 
 ## When Responding to GitHub Issues
 
+### ACTIONS TO TAKE:
+1. **Read** the entire issue including all comments
+2. **Analyze** the codebase to understand the problem
+3. **Implement** the fix in the code
+4. **Create a branch** named `fix/issue-{number}-{short-description}`
+5. **Run** `npm run lint` and `npm run test` before committing
+6. **Create a PR** with "Fixes #{issue_number}" in the description
+7. **Post a comment** on the issue with:
+   - Summary of what you did
+   - Link to the PR you created
+   - Any notes or caveats
+
 ### DO:
-- Read the entire issue including all comments before responding
-- Check for related issues or PRs that might provide context
-- Create a branch named `fix/issue-{number}-{short-description}`
-- Link the PR back to the issue using "Fixes #X" in the PR description
-- Run `npm run lint` and `npm run test` before committing
 - Keep commits focused and atomic
+- Follow existing code patterns in the codebase
+- Write tests for new functionality
 
 ### DON'T:
 - Make changes unrelated to the issue
 - Skip writing tests for new functionality
-- Ignore existing code patterns in the codebase
 - Push directly to main branch
 
 ---
@@ -73,7 +81,7 @@ Use these tags to categorize findings:
 
 ### Valid Issue Status Transitions:
 - OPEN → IN_PROGRESS
-- IN_PROGRESS → DONE  
+- IN_PROGRESS → DONE
 - DONE → OPEN
 
 ### Component Patterns:
