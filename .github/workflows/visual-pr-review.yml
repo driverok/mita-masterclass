@@ -6,6 +6,13 @@ on:
   issue_comment:
     types: [created]
 
+# Permissions at workflow level for OIDC
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
 jobs:
   visual-review:
     # Run on PR events OR when @claude is mentioned in PR comments
@@ -15,12 +22,6 @@ jobs:
        github.event.issue.pull_request &&
        contains(github.event.comment.body, '@claude'))
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: write
-      id-token: write
 
     steps:
       - name: Checkout repository
@@ -43,8 +44,8 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-20250514
-          mcp_config: |
+          claude_args: "--model claude-sonnet-4-20250514"
+          settings: |
             {
               "mcpServers": {
                 "playwright": {
