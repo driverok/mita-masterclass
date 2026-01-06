@@ -200,6 +200,51 @@ Before approving any PR, verify:
 
 ---
 
+## 🎭 Visual QA Testing (Playwright MCP)
+
+### When to Trigger:
+- Add label `qa-verify` to PR
+- Or comment `@claude /visual` on PR
+
+### What Claude Does:
+1. Starts dev server locally (http://localhost:3000)
+2. Uses Playwright MCP in headless mode
+3. Tests UI at 3 viewports: Desktop (1280px), Tablet (768px), Mobile (375px)
+4. Takes screenshots at each viewport
+5. Posts findings to PR with artifact link
+
+### QA Report Format:
+```markdown
+## 📱 Visual QA Report
+
+### Screenshots Captured
+- [List of screenshots with descriptions]
+
+### Desktop (1280px) Findings
+- ✅ or ❌ findings
+
+### Tablet (768px) Findings
+- ✅ or ❌ findings
+
+### Mobile (375px) Findings
+- ✅ or ❌ findings
+
+### Issues Found
+- ❌ [VISUAL] Issue description
+- Location: Page/component
+- Severity: Critical/High/Medium/Low
+
+### Recommendation: APPROVE | REQUEST_CHANGES | COMMENT
+```
+
+### Key Points:
+- Claude tests like a real user (black-box testing)
+- Continues testing even after finding bugs
+- Screenshots saved as GitHub Actions artifacts
+- Traces available for debugging
+
+---
+
 ## 🐞 Troubleshooting
 
 ### Claude Not Responding?
