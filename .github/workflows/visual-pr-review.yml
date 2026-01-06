@@ -53,6 +53,8 @@ jobs:
               }
             }
           prompt: |
+            First, read .github/CLAUDE.md for CI/CD specific instructions and follow them.
+
             You are reviewing PR #${{ github.event.pull_request.number }} for the MITA issue tracker app.
             
             Vercel Preview URL: ${{ steps.vercel.outputs.preview_url }}
