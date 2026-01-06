@@ -7,9 +7,27 @@ This marker confirms this CI/CD configuration is active.
 
 ---
 
-## When Responding to GitHub Issues
+## 🤖 Available Commands
 
-### ACTIONS TO TAKE:
+| Command | Description | Use Case |
+|---------|-------------|----------|
+| `@claude` | General assistance | Any question or task |
+| `/fix` | Auto-fix an issue | Issue has clear requirements |
+| `/review` | Code review | PR needs review |
+| `/explain` | Explain code | Understanding codebase |
+| `/help` | Show commands | Need help |
+
+---
+
+## 📋 When Responding to GitHub Issues
+
+### For General `@claude` Mentions:
+1. **Acknowledge** the request immediately
+2. **Clarify** if the request is ambiguous
+3. **Execute** the appropriate action
+4. **Report** what you did
+
+### For `/fix` Command:
 1. **Read** the entire issue including all comments
 2. **Analyze** the codebase to understand the problem
 3. **Implement** the fix in the code
@@ -25,38 +43,60 @@ This marker confirms this CI/CD configuration is active.
 - Keep commits focused and atomic
 - Follow existing code patterns in the codebase
 - Write tests for new functionality
+- Explain your reasoning
 
 ### DON'T:
 - Make changes unrelated to the issue
 - Skip writing tests for new functionality
 - Push directly to main branch
+- Ignore linting errors
 
 ---
 
-## When Reviewing Pull Requests
+## 🔍 When Reviewing Pull Requests
 
-### Check For (in order):
-1. **Security** - No exposed secrets, proper input validation
-2. **Error Handling** - Graceful failures, proper error messages
-3. **Type Safety** - Proper TypeScript types, no `any`
-4. **Tests** - New code has tests, existing tests pass
-5. **Performance** - No obvious N+1 queries, unnecessary re-renders
+### Check For (in order of priority):
+1. **[SECURITY]** - No exposed secrets, proper input validation, XSS prevention
+2. **[ERROR]** - Graceful failures, proper error messages, error boundaries
+3. **[TYPES]** - Proper TypeScript types, no `any`, correct generics
+4. **[TESTS]** - New code has tests, existing tests pass
+5. **[PERF]** - No N+1 queries, unnecessary re-renders, memory leaks
+6. **[A11Y]** - Accessibility: proper labels, keyboard navigation, ARIA
 
 ### Review Format:
-Use these tags to categorize findings:
-- `[CODE]` - Issues found in source code
-- `[VISUAL]` - Issues found during visual review (if using Playwright)
-- `[SECURITY]` - Security concerns
-- `[PERF]` - Performance issues
+```markdown
+## Code Review Summary
+
+### 🔒 Security
+- [Finding or ✅ No issues]
+
+### 🐛 Error Handling  
+- [Finding or ✅ No issues]
+
+### 📝 TypeScript
+- [Finding or ✅ No issues]
+
+### 🧪 Tests
+- [Finding or ✅ No issues]
+
+### ⚡ Performance
+- [Finding or ✅ No issues]
+
+### ♿ Accessibility
+- [Finding or ✅ No issues]
+
+### Verdict: [APPROVE | REQUEST_CHANGES | COMMENT]
+```
 
 ### DON'T:
 - Approve PRs with failing tests
 - Nitpick style issues that linters should catch
 - Request changes without explaining why
+- Be vague - always provide specific file:line references
 
 ---
 
-## When CI Fails
+## 🔧 When CI Fails
 
 ### Diagnosis Steps:
 1. Read the full error log
@@ -77,12 +117,14 @@ Use these tags to categorize findings:
 
 ---
 
-## MITA-Specific Rules
+## 📁 MITA-Specific Rules
 
 ### Valid Issue Status Transitions:
-- OPEN → IN_PROGRESS
-- IN_PROGRESS → DONE
-- DONE → OPEN
+```
+OPEN → IN_PROGRESS → DONE
+              ↑         ↓
+              └─────────┘ (reopen)
+```
 
 ### Component Patterns:
 - Client components need `'use client'` directive
@@ -94,3 +136,135 @@ Use these tags to categorize findings:
 - Use Vitest syntax (describe, it, expect)
 - Tests in `src/tests/`
 - Run with `npm test`
+- Minimum coverage for new code: statements, branches
+
+### File Structure:
+```
+src/
+├── app/           # Next.js App Router pages & API
+├── components/    # React components
+├── lib/           # Utilities, DB, validations
+└── tests/         # Vitest tests
+```
+
+---
+
+## 🎨 Code Style Preferences
+
+### TypeScript:
+```typescript
+// ✅ Good: Explicit types, no any
+function getIssue(id: string): Promise<Issue | null> { ... }
+
+// ❌ Bad: Using any
+function getIssue(id: any): any { ... }
+```
+
+### React Components:
+```typescript
+// ✅ Good: Props interface, proper typing
+interface IssueCardProps {
+  issue: Issue;
+  onStatusChange?: (status: Status) => void;
+}
+
+export function IssueCard({ issue, onStatusChange }: IssueCardProps) { ... }
+```
+
+### Error Handling:
+```typescript
+// ✅ Good: Specific error handling
+try {
+  const issue = await getIssue(id);
+  if (!issue) {
+    return NextResponse.json({ error: 'Issue not found' }, { status: 404 });
+  }
+} catch (error) {
+  console.error('Failed to fetch issue:', error);
+  return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+}
+```
+
+---
+
+## 🔐 Security Checklist
+
+Before approving any PR, verify:
+
+- [ ] No hardcoded secrets or API keys
+- [ ] User input is validated (Zod schemas in `lib/validations.ts`)
+- [ ] SQL queries use Prisma (no raw SQL with user input)
+- [ ] Authentication checked on protected routes
+- [ ] No sensitive data in client-side code
+- [ ] CSRF protection on mutations
+
+---
+
+## 🐞 Troubleshooting
+
+### Claude Not Responding?
+1. Check if `ANTHROPIC_API_KEY` secret is set
+2. Verify the trigger phrase is correct (`@claude`, `/fix`, etc.)
+3. Check GitHub Actions tab for workflow runs
+4. Look for errors in the workflow logs
+
+### Workflow Running But Failing?
+1. Check permissions in workflow file
+2. Verify `allowed_tools` includes needed tools
+3. Check if branch protection rules are blocking
+4. Review the Claude output in workflow logs
+
+### Common Fixes:
+```yaml
+# If Claude can't create branches:
+permissions:
+  contents: write  # ← Need this
+
+# If Claude can't comment:
+permissions:
+  issues: write      # ← For issues
+  pull-requests: write  # ← For PRs
+```
+
+---
+
+## 📚 Customization Examples
+
+### Add Environment-Aware Behavior:
+```yaml
+prompt: |
+  Environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+  
+  Production rules:
+  - Extra careful with changes
+  - Require comprehensive tests
+  
+  Development rules:
+  - Allow experimental approaches
+```
+
+### Restrict Tools by Event:
+```yaml
+allowed_tools: |
+  # Always available
+  Read
+  Glob
+  Grep
+  # Only for issues (not PRs)
+  ${{ !github.event.issue.pull_request && 'mcp__github__create_branch' || '' }}
+  ${{ !github.event.issue.pull_request && 'mcp__github__push_files' || '' }}
+```
+
+### Custom Labels Trigger Different Behaviors:
+```yaml
+prompt: |
+  Issue labels: ${{ join(github.event.issue.labels.*.name, ', ') }}
+  
+  If labeled 'urgent':
+  - Prioritize this fix
+  - Ping maintainers in your comment
+  
+  If labeled 'good-first-issue':
+  - Provide extra explanation
+  - Suggest learning resources
+```
