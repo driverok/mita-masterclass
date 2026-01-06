@@ -25,6 +25,7 @@ jobs:
       pull-requests: write
       issues: write
       id-token: write
+      actions: read
 
     steps:
       - name: Checkout repository
@@ -36,15 +37,6 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-20250514
-          allowed_tools: |
-            Read
-            Glob
-            Grep
-            mcp__github__pull_request_read
-            mcp__github__pull_request_review_write
-            mcp__github__add_comment_to_pending_review
-            mcp__github__add_issue_comment
           prompt: |
             # Code Review for PR #${{ github.event.issue.number }}
 
@@ -53,27 +45,16 @@ jobs:
             ## Your Task
             Perform a thorough code review of this pull request.
 
-            ### Step 1: Get PR Information
-            Use mcp__github__pull_request_read to get:
-            - PR diff and changed files
-            - PR description and context
+            1. Read the PR diff and changed files
+            2. Review for these categories (in priority order):
+               - **[SECURITY]** - Exposed secrets, input validation, XSS, auth bypass
+               - **[ERROR]** - Graceful failures, error messages, error boundaries
+               - **[TYPES]** - TypeScript types, no `any`, proper interfaces
+               - **[TESTS]** - New code has tests, existing tests pass
+               - **[PERF]** - N+1 queries, unnecessary re-renders, memory leaks
+               - **[A11Y]** - Accessibility: labels, keyboard nav, ARIA
 
-            ### Step 2: Review Categories
-            Check for issues in these categories (in priority order):
-            - **[SECURITY]** - Exposed secrets, input validation, XSS, auth bypass
-            - **[ERROR]** - Graceful failures, error messages, error boundaries
-            - **[TYPES]** - TypeScript types, no `any`, proper interfaces
-            - **[TESTS]** - New code has tests, existing tests pass
-            - **[PERF]** - N+1 queries, unnecessary re-renders, memory leaks
-            - **[A11Y]** - Accessibility: labels, keyboard nav, ARIA
-
-            ### Step 3: Create Review
-            Create inline comments for specific issues using:
-            - mcp__github__pull_request_review_write (method: create)
-            - mcp__github__add_comment_to_pending_review
-
-            ### Step 4: Post Summary
-            Post a summary comment with this format:
+            3. Post a summary comment with this format:
 
             ## Code Review Summary
 
@@ -81,24 +62,7 @@ jobs:
             [List of files with brief notes]
 
             ### Findings
-
-            #### Security
-            - [Finding or "No issues found"]
-
-            #### Error Handling
-            - [Finding or "No issues found"]
-
-            #### TypeScript
-            - [Finding or "No issues found"]
-
-            #### Tests
-            - [Finding or "No issues found"]
-
-            #### Performance
-            - [Finding or "No issues found"]
-
-            #### Accessibility
-            - [Finding or "No issues found"]
+            [For each category, list findings or "No issues found"]
 
             ### Verdict: [APPROVE | REQUEST_CHANGES | COMMENT]
 
@@ -107,6 +71,8 @@ jobs:
   # ============================================
   # @claude /visual - Visual QA on Vercel Preview
   # ============================================
+  # NOTE: Requires Vercel deployment protection to be DISABLED for preview URLs
+  # Go to Vercel Project Settings > Deployment Protection > Disable for Preview
   visual-review:
     if: |
       github.event.issue.pull_request &&
@@ -119,6 +85,7 @@ jobs:
       pull-requests: write
       issues: write
       id-token: write
+      actions: read
 
     steps:
       - name: Checkout repository
@@ -136,18 +103,8 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-20250514
           claude_args: |
             --mcp-config '{"mcpServers":{"playwright":{"command":"npx","args":["@playwright/mcp@latest","--headless"]}}}'
-          allowed_tools: |
-            mcp__playwright__browser_navigate
-            mcp__playwright__browser_click
-            mcp__playwright__browser_type
-            mcp__playwright__browser_take_screenshot
-            mcp__playwright__browser_resize
-            mcp__playwright__browser_snapshot
-            mcp__playwright__browser_wait
-            mcp__github__add_issue_comment
           prompt: |
             # Visual QA Review for PR #${{ github.event.issue.number }}
 
@@ -164,70 +121,14 @@ jobs:
             5. Type "demo123" in the password field (id="password")
             6. Click the "Sign in" button
             7. Wait for redirect to /issues page
-            8. Verify you are logged in by checking the page content
 
             ## Step 2: Screenshot Dashboard at 3 Viewports
 
             Take screenshots of the /issues dashboard at three viewport sizes:
+            - Desktop: 1280x720
+            - Tablet: 768x1024
+            - Mobile: 375x667
 
-            **Desktop (1280x720):**
-            1. browser_resize to width=1280, height=720
-            2. browser_take_screenshot
-            3. Note any layout issues
+            ## Step 3: Post Visual QA Report
 
-            **Tablet (768x1024):**
-            1. browser_resize to width=768, height=1024
-            2. browser_take_screenshot
-            3. Note responsive behavior
-
-            **Mobile (375x667):**
-            1. browser_resize to width=375, height=667
-            2. browser_take_screenshot
-            3. Note mobile-specific issues
-
-            ## Step 3: Check for Visual Issues
-
-            At each viewport, verify:
-            - Elements don't overflow horizontally
-            - Text is readable (not badly truncated)
-            - Buttons and links are visible and clickable
-            - Forms are usable
-            - Navigation is accessible
-            - Cards and lists display correctly
-
-            ## Step 4: Post Visual QA Report
-
-            Post a comment on the PR with this format:
-
-            ## Visual QA Report
-
-            **Preview URL:** ${{ steps.wait-for-vercel.outputs.url }}
-            **Login:** Successful with demo/demo123
-
-            ### Screenshots Captured
-
-            | Viewport | Size | Status |
-            |----------|------|--------|
-            | Desktop | 1280x720 | [OK/Issues] |
-            | Tablet | 768x1024 | [OK/Issues] |
-            | Mobile | 375x667 | [OK/Issues] |
-
-            ### Desktop (1280px) Findings
-            - [What works / what's broken]
-
-            ### Tablet (768px) Findings
-            - [What works / what's broken]
-
-            ### Mobile (375px) Findings
-            - [What works / what's broken]
-
-            ### Issues Found
-            For each issue:
-            - [VISUAL] Description of issue
-            - Location: Page/component affected
-            - Severity: Critical/High/Medium/Low
-
-            ### Recommendation
-            [APPROVE | REQUEST_CHANGES | COMMENT]
-
-            **Important:** Continue testing even if you find issues. Document ALL findings.
+            Post a comment with findings for each viewport, issues found, and recommendation (APPROVE/REQUEST_CHANGES/COMMENT).
