@@ -105,12 +105,6 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           show_full_output: true
-          allowed_tools: |
-            mcp__playwright__*
-            mcp__github__add_issue_comment
-            Read
-            Glob
-            Grep
           claude_args: |
             --mcp-config '{"mcpServers":{"playwright":{"command":"npx","args":["@playwright/mcp@latest","--headless"]}}}'
           prompt: |
@@ -139,10 +133,16 @@ jobs:
 
             ## Step 3: Post Visual QA Report
 
-            IMPORTANT: Use the `mcp__github__add_issue_comment` tool to post your report.
-            Do NOT use Bash or gh CLI commands - they will not work in this environment.
+            CRITICAL: You MUST use the `mcp__github__add_issue_comment` tool to post your report.
+            Do NOT use Bash, shell commands, or gh CLI - they do not have authentication in this environment.
 
-            Post a comment to issue #${{ github.event.issue.number }} with:
+            Use mcp__github__add_issue_comment with these parameters:
+            - owner: "driverok"
+            - repo: "mita-masterclass"
+            - issue_number: ${{ github.event.issue.number }}
+            - body: Your full visual QA report in markdown format
+
+            Your report should include:
             - Findings for each viewport (Desktop, Tablet, Mobile)
             - Any visual issues found (layout breaks, overflow, accessibility)
             - Screenshots description (what was captured)
