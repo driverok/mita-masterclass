@@ -1,65 +1,45 @@
+# Claude Code - Interactive Mode
+# Based on: https://github.com/anthropics/claude-code-action/blob/main/examples/claude.yml
+#
+# IMPORTANT: Do NOT add 'prompt' here - it disables interactive comment mode!
+
 name: Claude Code
 
 on:
-  issues:
-    types: [opened, edited]
   issue_comment:
     types: [created]
   pull_request_review_comment:
     types: [created]
-  pull_request:
-    types: [opened, synchronize]
+  pull_request_review:
+    types: [submitted]
+  issues:
+    types: [opened, assigned]
 
 jobs:
   claude:
-    # Properly check for @claude mention based on event type
     if: |
-      (github.event_name == 'issues' && contains(github.event.issue.body, '@claude')) ||
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request' && contains(github.event.pull_request.body, '@claude'))
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
 
     permissions:
       contents: write
-      issues: write
       pull-requests: write
+      issues: write
       id-token: write
+      actions: read
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          fetch-depth: 1
 
       - name: Run Claude Code
+        id: claude
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          model: claude-sonnet-4-20250514
-          # Enable tools Claude needs for issue resolution
-          allowed_tools: |
-            mcp__github__create_branch
-            mcp__github__create_pull_request
-            mcp__github__add_issue_comment
-            mcp__github__push_files
-            Bash(git *)
-            Bash(npm *)
-            Read
-            Edit
-            Write
-            Glob
-            Grep
-          prompt: |
-            First, read .github/CLAUDE.md for CI/CD specific instructions.
-            Then read the root CLAUDE.md for project conventions.
-            
-            ## Context
-            - Repository: ${{ github.repository }}
-            - Event: ${{ github.event_name }}
-            - Actor: ${{ github.actor }}
-            - Ref: ${{ github.ref }}
-            
-            ## Your Task
-            Respond to the @claude mention by following the instructions in .github/CLAUDE.md.
-            Always acknowledge the request and explain what you're doing.
+          # NO prompt = interactive mode = auto-responds to @claude
