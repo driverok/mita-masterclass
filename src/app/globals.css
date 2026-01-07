@@ -34,7 +34,7 @@
   }
 
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4;
+    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4;
   }
 
   .badge {
