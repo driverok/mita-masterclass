@@ -113,8 +113,8 @@ export default function IssuesPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-500">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center dark:bg-gray-900">
+        <div className="text-gray-500 dark:text-gray-400">Loading...</div>
       </div>
     )
   }
@@ -124,13 +124,13 @@ export default function IssuesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-white shadow-sm dark:bg-gray-800 dark:shadow-gray-700">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">MITA</h1>
-            <p className="text-sm text-gray-500">Mini Issue Tracker</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">MITA</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Mini Issue Tracker</p>
           </div>
           <div className="flex items-center gap-4">
             <button
@@ -139,7 +139,7 @@ export default function IssuesPage() {
             >
               Sprint Dashboard
             </button>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-300">
               Welcome, {session.user.name}
             </span>
             <button
@@ -156,7 +156,7 @@ export default function IssuesPage() {
       <main className="max-w-4xl mx-auto px-4 py-8">
         {/* Actions Bar */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">Your Issues</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Your Issues</h2>
           <button
             onClick={() => setShowForm(true)}
             className="px-4 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 bg-green-600 text-white hover:bg-green-700 focus:ring-green-500"
@@ -216,19 +216,19 @@ export default function IssuesPage() {
             <div className="text-2xl font-bold text-blue-600">
               {issues.filter((i) => i.status === 'OPEN').length}
             </div>
-            <div className="text-sm text-gray-500">Open</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Open</div>
           </div>
           <div className="card text-center">
             <div className="text-2xl font-bold text-purple-600">
               {issues.filter((i) => i.status === 'IN_PROGRESS').length}
             </div>
-            <div className="text-sm text-gray-500">In Progress</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">In Progress</div>
           </div>
           <div className="card text-center">
             <div className="text-2xl font-bold text-green-600">
               {issues.filter((i) => i.status === 'DONE').length}
             </div>
-            <div className="text-sm text-gray-500">Done</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Done</div>
           </div>
         </div>
       </main>

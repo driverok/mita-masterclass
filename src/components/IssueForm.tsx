@@ -42,11 +42,11 @@ export function IssueForm({ onSubmit, onCancel }: IssueFormProps) {
 
   return (
     <div className="card">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">Create New Issue</h3>
+      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Create New Issue</h3>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm">
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-2 rounded-lg text-sm dark:bg-red-900/20 dark:border-red-800 dark:text-red-400">
             {error}
           </div>
         )}

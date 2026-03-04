@@ -91,8 +91,8 @@ export default function SprintsPage() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-gray-500">Loading...</div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-gray-500 dark:text-gray-400">Loading...</div>
       </div>
     );
   }
@@ -102,20 +102,20 @@ export default function SprintsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Sprint Dashboard</h1>
-            <p className="text-gray-500 mt-1">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Sprint Dashboard</h1>
+            <p className="text-gray-500 dark:text-gray-400 mt-1">
               Track your sprint progress and team velocity
             </p>
           </div>
           <div className="flex gap-4">
             <button
               onClick={() => router.push('/issues')}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900"
+              className="px-4 py-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
             >
               ← Back to Issues
             </button>
@@ -130,15 +130,15 @@ export default function SprintsPage() {
 
         {/* Create Sprint Form */}
         {showCreateForm && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold mb-4">Create New Sprint</h2>
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-6">
+            <h2 className="text-lg font-semibold mb-4 dark:text-white">Create New Sprint</h2>
             <form onSubmit={handleCreateSprint} className="flex gap-4">
               <input
                 type="text"
                 value={newSprintName}
                 onChange={(e) => setNewSprintName(e.target.value)}
                 placeholder="Sprint name (e.g., Sprint 1)"
-                className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 dark:placeholder-gray-400"
                 autoFocus
               />
               <button
@@ -154,24 +154,24 @@ export default function SprintsPage() {
                   setShowCreateForm(false);
                   setNewSprintName('');
                 }}
-                className="px-4 py-2 text-gray-600 hover:text-gray-900"
+                className="px-4 py-2 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
               >
                 Cancel
               </button>
             </form>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
               Sprint will be 14 days starting from today.
             </p>
           </div>
         )}
 
         {sprints.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
             <div className="text-6xl mb-4">📊</div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-2">
               No Sprints Yet
             </h2>
-            <p className="text-gray-500 mb-6">
+            <p className="text-gray-500 dark:text-gray-400 mb-6">
               Create your first sprint to start tracking progress
             </p>
             <button
@@ -185,7 +185,7 @@ export default function SprintsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Sprint List (Sidebar) */}
             <div className="lg:col-span-1 space-y-4">
-              <h2 className="text-lg font-semibold text-gray-800">Sprints</h2>
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Sprints</h2>
               {sprints.map((sprint) => (
                 <SprintSummary
                   key={sprint.id}
