@@ -49,20 +49,20 @@ export default function SprintSummary({
     : 'active';
 
   const statusBadge = {
-    upcoming: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Upcoming' },
-    active: { bg: 'bg-green-100', text: 'text-green-800', label: 'Active' },
-    completed: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Completed' },
+    upcoming: { bg: 'bg-yellow-100 dark:bg-yellow-900/40', text: 'text-yellow-800 dark:text-yellow-300', label: 'Upcoming' },
+    active: { bg: 'bg-green-100 dark:bg-green-900/40', text: 'text-green-800 dark:text-green-300', label: 'Active' },
+    completed: { bg: 'bg-gray-100 dark:bg-gray-700', text: 'text-gray-800 dark:text-gray-300', label: 'Completed' },
   }[sprintStatus];
 
   return (
     <div
       onClick={onSelect}
-      className={`bg-white rounded-lg shadow p-4 cursor-pointer transition-all hover:shadow-md ${
+      className={`bg-white dark:bg-gray-800 rounded-lg shadow p-4 cursor-pointer transition-all hover:shadow-md ${
         selected ? 'ring-2 ring-blue-500' : ''
       }`}
     >
       <div className="flex justify-between items-start mb-3">
-        <h3 className="font-semibold text-gray-800">{sprint.name}</h3>
+        <h3 className="font-semibold text-gray-800 dark:text-gray-200">{sprint.name}</h3>
         <span
           className={`px-2 py-1 rounded-full text-xs font-medium ${statusBadge.bg} ${statusBadge.text}`}
         >
@@ -70,18 +70,18 @@ export default function SprintSummary({
         </span>
       </div>
 
-      <div className="text-sm text-gray-500 mb-3">
+      <div className="text-sm text-gray-500 dark:text-gray-400 mb-3">
         {format(startDate, 'MMM d')} - {format(endDate, 'MMM d, yyyy')}
       </div>
 
       <div className="mb-3">
         <div className="flex justify-between text-sm mb-1">
-          <span className="text-gray-600">Progress</span>
-          <span className="font-medium">
+          <span className="text-gray-600 dark:text-gray-400">Progress</span>
+          <span className="font-medium dark:text-gray-200">
             {completedPoints} / {totalPoints} pts ({progressPercent}%)
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
           <div
             className="bg-blue-500 rounded-full h-2 transition-all"
             style={{ width: `${progressPercent}%` }}
@@ -91,16 +91,16 @@ export default function SprintSummary({
 
       <div className="grid grid-cols-3 gap-2 text-center text-sm">
         <div>
-          <div className="font-semibold text-gray-800">{issues.length}</div>
-          <div className="text-gray-500">Issues</div>
+          <div className="font-semibold text-gray-800 dark:text-gray-200">{issues.length}</div>
+          <div className="text-gray-500 dark:text-gray-400">Issues</div>
         </div>
         <div>
-          <div className="font-semibold text-gray-800">{daysElapsed}</div>
-          <div className="text-gray-500">Days In</div>
+          <div className="font-semibold text-gray-800 dark:text-gray-200">{daysElapsed}</div>
+          <div className="text-gray-500 dark:text-gray-400">Days In</div>
         </div>
         <div>
-          <div className="font-semibold text-gray-800">{daysRemaining}</div>
-          <div className="text-gray-500">Days Left</div>
+          <div className="font-semibold text-gray-800 dark:text-gray-200">{daysRemaining}</div>
+          <div className="text-gray-500 dark:text-gray-400">Days Left</div>
         </div>
       </div>
     </div>

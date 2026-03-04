@@ -23,7 +23,7 @@ export default function StoryPointsSelect({
         onChange(val === '' ? null : parseInt(val, 10));
       }}
       disabled={disabled}
-      className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${className}`}
+      className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 dark:disabled:bg-gray-700 ${className}`}
     >
       <option value="">No estimate</option>
       {STORY_POINT_VALUES.map((points) => (

@@ -68,16 +68,16 @@ export default function BurndownChart({ sprintId }: BurndownChartProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow">
-        <div className="text-gray-500">Loading burndown chart...</div>
+      <div className="flex items-center justify-center h-64 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="text-gray-500 dark:text-gray-400">Loading burndown chart...</div>
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow">
-        <div className="text-red-500">{error || 'No data available'}</div>
+      <div className="flex items-center justify-center h-64 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="text-red-500 dark:text-red-400">{error || 'No data available'}</div>
       </div>
     );
   }
@@ -92,16 +92,16 @@ export default function BurndownChart({ sprintId }: BurndownChartProps) {
   }));
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-800">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
           Sprint Burndown: {data.sprint.name}
         </h2>
         <div
           className={`px-3 py-1 rounded-full text-sm font-medium ${
             data.summary.onTrack
-              ? 'bg-green-100 text-green-800'
-              : 'bg-red-100 text-red-800'
+              ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
+              : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'
           }`}
         >
           {data.summary.onTrack ? '✓ On Track' : '⚠ Behind Schedule'}
@@ -110,54 +110,56 @@ export default function BurndownChart({ sprintId }: BurndownChartProps) {
 
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="text-center">
-          <div className="text-2xl font-bold text-gray-800">
+          <div className="text-2xl font-bold text-gray-800 dark:text-gray-200">
             {data.summary.totalPoints}
           </div>
-          <div className="text-sm text-gray-500">Total Points</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">Total Points</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-green-600">
+          <div className="text-2xl font-bold text-green-600 dark:text-green-400">
             {data.summary.completedPoints}
           </div>
-          <div className="text-sm text-gray-500">Completed</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">Completed</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-blue-600">
+          <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
             {data.summary.remainingPoints}
           </div>
-          <div className="text-sm text-gray-500">Remaining</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">Remaining</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-purple-600">
+          <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
             {data.summary.percentComplete}%
           </div>
-          <div className="text-sm text-gray-500">Complete</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">Complete</div>
         </div>
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
           <XAxis
             dataKey="day"
             label={{ value: 'Day', position: 'insideBottom', offset: -5 }}
+            stroke="#9CA3AF"
           />
           <YAxis
             label={{ value: 'Story Points', angle: -90, position: 'insideLeft' }}
+            stroke="#9CA3AF"
           />
           <Tooltip
             content={({ active, payload, label }) => {
               if (active && payload && payload.length) {
                 const point = chartData.find((d) => d.day === label);
                 return (
-                  <div className="bg-white p-3 border rounded shadow-lg">
-                    <p className="font-semibold">Day {label}</p>
-                    <p className="text-sm text-gray-500">{point?.date}</p>
-                    <p className="text-gray-600">
+                  <div className="bg-white dark:bg-gray-700 p-3 border border-gray-200 dark:border-gray-600 rounded shadow-lg">
+                    <p className="font-semibold dark:text-gray-100">Day {label}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{point?.date}</p>
+                    <p className="text-gray-600 dark:text-gray-300">
                       Ideal: {payload[0]?.value?.toFixed(1)} pts
                     </p>
                     {payload[1]?.value !== undefined && (
-                      <p className="text-blue-600">
+                      <p className="text-blue-600 dark:text-blue-400">
                         Actual: {payload[1]?.value} pts
                       </p>
                     )}
@@ -196,7 +198,7 @@ export default function BurndownChart({ sprintId }: BurndownChartProps) {
         </LineChart>
       </ResponsiveContainer>
 
-      <div className="mt-4 text-sm text-gray-500 text-center">
+      <div className="mt-4 text-sm text-gray-500 dark:text-gray-400 text-center">
         {data.sprint.startDate} to {data.sprint.endDate}
       </div>
     </div>
