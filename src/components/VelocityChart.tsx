@@ -51,27 +51,27 @@ export default function VelocityChart() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow">
-        <div className="text-gray-500">Loading velocity data...</div>
+      <div className="flex items-center justify-center h-64 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="text-gray-500 dark:text-gray-400">Loading velocity data...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow">
-        <div className="text-red-500">{error}</div>
+      <div className="flex items-center justify-center h-64 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="text-red-500 dark:text-red-400">{error}</div>
       </div>
     );
   }
 
   if (!data || data.sprints.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
           Velocity Trend
         </h2>
-        <div className="flex items-center justify-center h-48 text-gray-500">
+        <div className="flex items-center justify-center h-48 text-gray-500 dark:text-gray-400">
           No completed sprints yet. Complete a sprint to see velocity data.
         </div>
       </div>
@@ -85,18 +85,18 @@ export default function VelocityChart() {
       ? 'text-green-600'
       : data.trend === 'decreasing'
       ? 'text-red-600'
-      : 'text-gray-600';
+      : 'text-gray-600 dark:text-gray-400';
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-800">Velocity Trend</h2>
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Velocity Trend</h2>
         <div className="flex items-center gap-4">
           <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">
               {data.averageVelocity}
             </div>
-            <div className="text-sm text-gray-500">Avg Velocity</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Avg Velocity</div>
           </div>
           <div className={`text-2xl ${trendColor}`}>{trendIcon}</div>
         </div>
@@ -107,27 +107,30 @@ export default function VelocityChart() {
           data={data.sprints}
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
           <XAxis
             dataKey="name"
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 12, fill: '#9CA3AF' }}
             interval={0}
             angle={-45}
             textAnchor="end"
             height={60}
           />
-          <YAxis label={{ value: 'Points', angle: -90, position: 'insideLeft' }} />
+          <YAxis
+            label={{ value: 'Points', angle: -90, position: 'insideLeft', fill: '#9CA3AF' }}
+            tick={{ fill: '#9CA3AF' }}
+          />
           <Tooltip
             content={({ active, payload }) => {
               if (active && payload && payload.length) {
                 const sprint = payload[0].payload;
                 return (
-                  <div className="bg-white p-3 border rounded shadow-lg">
-                    <p className="font-semibold">{sprint.name}</p>
-                    <p className="text-sm text-gray-500">
+                  <div className="bg-white dark:bg-gray-700 p-3 border border-gray-200 dark:border-gray-600 rounded shadow-lg">
+                    <p className="font-semibold dark:text-white">{sprint.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {sprint.startDate} - {sprint.endDate}
                     </p>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-300">
                       Committed: {sprint.committedPoints} pts
                     </p>
                     <p className="text-green-600">
@@ -139,7 +142,7 @@ export default function VelocityChart() {
               return null;
             }}
           />
-          <Legend />
+          <Legend wrapperStyle={{ color: '#9CA3AF' }} />
           <ReferenceLine
             y={data.averageVelocity}
             stroke="#EF4444"
