@@ -51,27 +51,27 @@ export default function VelocityChart() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow">
-        <div className="text-gray-500">Loading velocity data...</div>
+      <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow dark:bg-gray-800 dark:border dark:border-gray-700">
+        <div className="text-gray-500 dark:text-gray-400">Loading velocity data...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow">
-        <div className="text-red-500">{error}</div>
+      <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow dark:bg-gray-800 dark:border dark:border-gray-700">
+        <div className="text-red-500 dark:text-red-400">{error}</div>
       </div>
     );
   }
 
   if (!data || data.sprints.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+      <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-800 dark:border dark:border-gray-700">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4 dark:text-gray-100">
           Velocity Trend
         </h2>
-        <div className="flex items-center justify-center h-48 text-gray-500">
+        <div className="flex items-center justify-center h-48 text-gray-500 dark:text-gray-400">
           No completed sprints yet. Complete a sprint to see velocity data.
         </div>
       </div>
@@ -88,15 +88,15 @@ export default function VelocityChart() {
       : 'text-gray-600';
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white rounded-lg shadow p-6 dark:bg-gray-800 dark:border dark:border-gray-700">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gray-800">Velocity Trend</h2>
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Velocity Trend</h2>
         <div className="flex items-center gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {data.averageVelocity}
             </div>
-            <div className="text-sm text-gray-500">Avg Velocity</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Avg Velocity</div>
           </div>
           <div className={`text-2xl ${trendColor}`}>{trendIcon}</div>
         </div>
@@ -122,15 +122,15 @@ export default function VelocityChart() {
               if (active && payload && payload.length) {
                 const sprint = payload[0].payload;
                 return (
-                  <div className="bg-white p-3 border rounded shadow-lg">
-                    <p className="font-semibold">{sprint.name}</p>
-                    <p className="text-sm text-gray-500">
+                  <div className="bg-white p-3 border rounded shadow-lg dark:bg-gray-700 dark:border-gray-600">
+                    <p className="font-semibold dark:text-gray-100">{sprint.name}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {sprint.startDate} - {sprint.endDate}
                     </p>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-300">
                       Committed: {sprint.committedPoints} pts
                     </p>
-                    <p className="text-green-600">
+                    <p className="text-green-600 dark:text-green-400">
                       Completed: {sprint.completedPoints} pts
                     </p>
                   </div>

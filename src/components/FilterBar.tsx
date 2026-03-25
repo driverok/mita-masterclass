@@ -20,10 +20,10 @@ export function FilterBar({
   return (
     <div className="card mb-6">
       <div className="flex flex-wrap items-center gap-4">
-        <span className="text-sm font-medium text-gray-700">Filter by:</span>
+        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Filter by:</span>
 
         <div className="flex items-center gap-2">
-          <label htmlFor="status-filter" className="text-sm text-gray-600">
+          <label htmlFor="status-filter" className="text-sm text-gray-600 dark:text-gray-400">
             Status:
           </label>
           <select
@@ -40,7 +40,7 @@ export function FilterBar({
         </div>
 
         <div className="flex items-center gap-2">
-          <label htmlFor="priority-filter" className="text-sm text-gray-600">
+          <label htmlFor="priority-filter" className="text-sm text-gray-600 dark:text-gray-400">
             Priority:
           </label>
           <select
@@ -62,7 +62,7 @@ export function FilterBar({
               onStatusChange('')
               onPriorityChange('')
             }}
-            className="text-sm text-primary-600 hover:text-primary-500"
+            className="text-sm text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
           >
             Clear filters
           </button>

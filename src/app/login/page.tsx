@@ -38,21 +38,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h1 className="text-center text-3xl font-bold text-gray-900">MITA</h1>
-          <h2 className="mt-2 text-center text-xl text-gray-600">
+          <h1 className="text-center text-3xl font-bold text-gray-900 dark:text-gray-100">MITA</h1>
+          <h2 className="mt-2 text-center text-xl text-gray-600 dark:text-gray-300">
             Mini Issue Tracker
           </h2>
-          <p className="mt-4 text-center text-sm text-gray-500">
+          <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
             Sign in to your account
           </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm dark:bg-red-900/30 dark:border-red-700 dark:text-red-400">
               {error}
             </div>
           )}
@@ -99,16 +99,16 @@ export default function LoginPage() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
 
-          <p className="text-center text-sm text-gray-600">
+          <p className="text-center text-sm text-gray-600 dark:text-gray-400">
             Don&apos;t have an account?{' '}
-            <Link href="/register" className="text-primary-600 hover:text-primary-500">
+            <Link href="/register" className="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300">
               Register
             </Link>
           </p>
         </form>
 
-        <div className="mt-4 p-4 bg-gray-100 rounded-lg">
-          <p className="text-sm text-gray-600 text-center">
+        <div className="mt-4 p-4 bg-gray-100 rounded-lg dark:bg-gray-800">
+          <p className="text-sm text-gray-600 text-center dark:text-gray-400">
             <strong>Demo credentials:</strong><br />
             Username: demo<br />
             Password: demo123
