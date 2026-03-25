@@ -1,7 +1,7 @@
 # CLAUDE.md - CI/CD Operations
 
 ## 🎯 IMPORTANT: Response Marker
-**Always start every response with:** "👋 Hello Movella Team!"
+**Always start every response with:** "👋 Hello Perforce Team!"
 
 This marker confirms this CI/CD configuration is active.
 
