@@ -139,26 +139,26 @@ export function IssueCard({
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
-            <h3 className="text-lg font-medium text-gray-900 truncate">{issue.title}</h3>
+            <h3 className="text-lg font-medium text-gray-900 truncate dark:text-gray-100">{issue.title}</h3>
             <div className="flex items-center gap-2 flex-shrink-0">
               <span className={`badge-${issue.priority.toLowerCase()}`}>
                 {priorityLabels[issue.priority as IssuePriority]}
               </span>
               {issue.storyPoints && (
-                <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs font-medium">
+                <span className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs font-medium dark:bg-purple-900 dark:text-purple-200">
                   {issue.storyPoints} {issue.storyPoints === 1 ? 'pt' : 'pts'}
                 </span>
               )}
             </div>
           </div>
-          <p className="text-gray-600 mb-3">{issue.description}</p>
+          <p className="text-gray-600 mb-3 dark:text-gray-300">{issue.description}</p>
           <div className="flex items-center gap-4 text-sm">
             <span
               className={`badge-${issue.status === 'IN_PROGRESS' ? 'in-progress' : issue.status.toLowerCase()}`}
             >
               {statusLabels[issue.status as IssueStatus]}
             </span>
-            <span className="text-gray-400">
+            <span className="text-gray-400 dark:text-gray-500">
               Created {new Date(issue.createdAt).toLocaleDateString()}
             </span>
           </div>
